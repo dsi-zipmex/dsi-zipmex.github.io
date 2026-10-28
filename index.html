@@ -69,7 +69,7 @@
     <div style="font-size:16px;color:var(--muted);margin-top:6px">สถานที่: <a id="m-place" href="https://maps.app.goo.gl/L9F37NFZwfWs8qNb7" target="_blank" rel="noopener"></a></div>
     <a class="btnlink" href="https://maps.app.goo.gl/L9F37NFZwfWs8qNb7" target="_blank" rel="noopener">เปิดแผนที่นำทาง</a>
     <div id="m-status"></div>
-    <a id="m-form" class="btnlink hidden" href="https://drive.google.com/file/d/1RijOHd4XjipTJcfeYXu9B-LrpygupMcJ/view?usp=sharing" target="_blank" rel="noopener">ดาวน์โหลดหนังสือแจ้งความไม่ประสงค์ดำเนินคดี</a>
+    <a id="m-form" class="btnlink hidden" href="https://drive.google.com/file/d/1RijOHd4XjipTJcfeYXu9B-LrpygupMcJ/view?usp=sharing" target="_blank" rel="noopener">ดาวน์โหลดหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษ</a>
     <div id="m-actions">
       <button class="primary" id="btn-confirm">ยืนยันว่าจะไปตามนัด</button>
       <button class="secondary" id="btn-resched">ขอเปลี่ยนวันเวลา</button>
@@ -89,9 +89,9 @@
 
   <section id="v-nopros" class="card hidden">
     <div class="name">แจ้งไม่ประสงค์ดำเนินคดี</div>
-    <p>กรุณากรอก<b>หนังสือแจ้งความไม่ประสงค์ดำเนินคดี</b>ที่แนบมากับหมายเรียก ลงลายมือชื่อ แนบสำเนาบัตรประชาชนที่รับรองสำเนาถูกต้อง แล้วส่งไปที่</p>
+    <p>กรุณากรอก<b>หนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษ</b>ที่แนบมากับหมายเรียก ลงลายมือชื่อ แนบสำเนาบัตรประชาชนที่รับรองสำเนาถูกต้อง แล้วส่งไปที่</p>
     <p style="font-size:16px;color:var(--muted)">หากไม่ได้รับหนังสือหรือเอกสารสูญหาย สามารถดาวน์โหลดไปพิมพ์และกรอกได้ที่ลิงก์นี้</p>
-    <a class="btnlink" href="https://drive.google.com/file/d/1RijOHd4XjipTJcfeYXu9B-LrpygupMcJ/view?usp=sharing" target="_blank" rel="noopener">ดาวน์โหลดหนังสือแจ้งความไม่ประสงค์ดำเนินคดี</a>
+    <a class="btnlink" href="https://drive.google.com/file/d/1RijOHd4XjipTJcfeYXu9B-LrpygupMcJ/view?usp=sharing" target="_blank" rel="noopener">ดาวน์โหลดหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษ</a>
     <p id="n-address" style="font-weight:600"></p>
     <label for="n-phone">เบอร์โทรศัพท์ที่ติดต่อได้ (ไม่บังคับ)</label>
     <input id="n-phone" inputmode="tel" maxlength="20">
@@ -136,8 +136,8 @@
     SCHEDULED: ['', ''],
     CONFIRMED: ['ok', 'ท่านยืนยันแล้วว่าจะไปตามนัด กรุณานำบัตรประชาชน เอกสารหรืออีเมลที่แสดงรายละเอียดการลงทุน และรายการเดินบัญชี (Statement) ไปด้วย'],
     RESCHEDULED: ['ok', 'เปลี่ยนวันเวลานัดเรียบร้อยแล้ว กรุณานำบัตรประชาชน เอกสารหรืออีเมลที่แสดงรายละเอียดการลงทุน และรายการเดินบัญชี (Statement) ไปด้วย'],
-    NO_PROSECUTION_PENDING: ['warn', 'ระบบบันทึกว่าท่านไม่ประสงค์ดำเนินคดีแล้ว กรุณาส่งหนังสือแจ้งความไม่ประสงค์ดำเนินคดีตัวจริงไปยังกองคดีธุรกิจการเงินนอกระบบ ทางไปรษณีย์'],
-    NO_PROSECUTION_RECEIVED: ['warn', 'เจ้าหน้าที่ได้รับหนังสือแจ้งความไม่ประสงค์ดำเนินคดีของท่านแล้ว'],
+    NO_PROSECUTION_PENDING: ['warn', 'ระบบบันทึกว่าท่านไม่ประสงค์ดำเนินคดีแล้ว กรุณาส่งหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษตัวจริงไปยังกองคดีธุรกิจการเงินนอกระบบ ทางไปรษณีย์'],
+    NO_PROSECUTION_RECEIVED: ['warn', 'เจ้าหน้าที่ได้รับหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษของท่านแล้ว'],
     ARRIVED: ['ok', 'ท่านได้ไปให้ปากคำแล้ว ขอบคุณครับ/ค่ะ'],
   };
   var REASON_TEXT = {
