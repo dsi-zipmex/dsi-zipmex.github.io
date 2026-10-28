@@ -266,8 +266,7 @@
   };
   $('btn-nopros').onclick = function () { show('nopros'); };
   $('n-save').onclick = function () {
-    if (!window.confirm('ยืนยันแจ้งว่าไม่ประสงค์ดำเนินคดี?
-การแจ้งจะมีผลเมื่อเจ้าหน้าที่ได้รับหนังสือตัวจริงที่ลงลายมือชื่อแล้ว')) return;
+    if (!window.confirm('ยืนยันแจ้งว่าไม่ประสงค์ดำเนินคดี?\nการแจ้งจะมีผลเมื่อเจ้าหน้าที่ได้รับหนังสือตัวจริงที่ลงลายมือชื่อแล้ว')) return;
     call('noProsecution', [session, $('n-phone').value, $('n-note').value], function (res) {
       render(res);
     }, 'n-msg');
