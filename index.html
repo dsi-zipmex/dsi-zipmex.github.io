@@ -13,6 +13,8 @@
   body { margin:0; background:var(--bg); color:var(--ink); font:18px/1.6 'Sarabun',sans-serif; }
   main { max-width:520px; margin:0 auto; padding:16px; }
   header { text-align:center; padding:12px 0 4px; }
+  header img { width:84px; height:auto; display:block; margin:0 auto 6px; }
+  a.btnlink { display:block; text-align:center; font-weight:600; padding:12px; margin-top:10px; border:1px solid var(--brand); border-radius:10px; color:var(--brand); text-decoration:none; }
   header h1 { font-size:20px; margin:0; color:var(--brand); font-weight:600; }
   header p { margin:2px 0 0; color:var(--muted); font-size:15px; }
   .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:18px; margin:14px 0; }
@@ -41,6 +43,7 @@
 <body>
 <main>
   <header>
+    <img src="logo.jpg" alt="ตรากรมสอบสวนคดีพิเศษ">
     <h1>กรมสอบสวนคดีพิเศษ</h1>
     <p>กองคดีธุรกิจการเงินนอกระบบ · การนัดหมายให้ปากคำ</p>
   </header>
@@ -63,8 +66,10 @@
     <div class="name" id="m-name"></div>
     <div>วันเวลานัดของท่าน</div>
     <div class="appt" id="m-appt"></div>
-    <div style="font-size:16px;color:var(--muted);margin-top:6px">สถานที่: <span id="m-place"></span></div>
+    <div style="font-size:16px;color:var(--muted);margin-top:6px">สถานที่: <a id="m-place" href="https://maps.app.goo.gl/L9F37NFZwfWs8qNb7" target="_blank" rel="noopener"></a></div>
+    <a class="btnlink" href="https://maps.app.goo.gl/L9F37NFZwfWs8qNb7" target="_blank" rel="noopener">เปิดแผนที่นำทาง</a>
     <div id="m-status"></div>
+    <a id="m-form" class="btnlink hidden" href="https://drive.google.com/file/d/1RijOHd4XjipTJcfeYXu9B-LrpygupMcJ/view?usp=sharing" target="_blank" rel="noopener">ดาวน์โหลดหนังสือแจ้งความไม่ประสงค์ดำเนินคดี</a>
     <div id="m-actions">
       <button class="primary" id="btn-confirm">ยืนยันว่าจะไปตามนัด</button>
       <button class="secondary" id="btn-resched">ขอเปลี่ยนวันเวลา</button>
@@ -85,6 +90,8 @@
   <section id="v-nopros" class="card hidden">
     <div class="name">แจ้งไม่ประสงค์ดำเนินคดี</div>
     <p>กรุณากรอก<b>หนังสือแจ้งความไม่ประสงค์ดำเนินคดี</b>ที่แนบมากับหมายเรียก ลงลายมือชื่อ แนบสำเนาบัตรประชาชนที่รับรองสำเนาถูกต้อง แล้วส่งไปที่</p>
+    <p style="font-size:16px;color:var(--muted)">หากไม่ได้รับหนังสือหรือเอกสารสูญหาย สามารถดาวน์โหลดไปพิมพ์และกรอกได้ที่ลิงก์นี้</p>
+    <a class="btnlink" href="https://drive.google.com/file/d/1RijOHd4XjipTJcfeYXu9B-LrpygupMcJ/view?usp=sharing" target="_blank" rel="noopener">ดาวน์โหลดหนังสือแจ้งความไม่ประสงค์ดำเนินคดี</a>
     <p id="n-address" style="font-weight:600"></p>
     <label for="n-phone">เบอร์โทรศัพท์ที่ติดต่อได้ (ไม่บังคับ)</label>
     <input id="n-phone" inputmode="tel" maxlength="20">
@@ -127,8 +134,8 @@
   var session = null, current = null;
   var STATUS_TEXT = {
     SCHEDULED: ['', ''],
-    CONFIRMED: ['ok', 'ท่านยืนยันแล้วว่าจะไปตามนัด กรุณานำบัตรประชาชน หมายเรียกฉบับนี้ และรายการเดินบัญชี (Statement) ไปด้วย'],
-    RESCHEDULED: ['ok', 'เปลี่ยนวันเวลานัดเรียบร้อยแล้ว กรุณานำบัตรประชาชน หมายเรียกฉบับนี้ และรายการเดินบัญชี (Statement) ไปด้วย'],
+    CONFIRMED: ['ok', 'ท่านยืนยันแล้วว่าจะไปตามนัด กรุณานำบัตรประชาชน เอกสารหรืออีเมลที่แสดงรายละเอียดการลงทุน และรายการเดินบัญชี (Statement) ไปด้วย'],
+    RESCHEDULED: ['ok', 'เปลี่ยนวันเวลานัดเรียบร้อยแล้ว กรุณานำบัตรประชาชน เอกสารหรืออีเมลที่แสดงรายละเอียดการลงทุน และรายการเดินบัญชี (Statement) ไปด้วย'],
     NO_PROSECUTION_PENDING: ['warn', 'ระบบบันทึกว่าท่านไม่ประสงค์ดำเนินคดีแล้ว กรุณาส่งหนังสือแจ้งความไม่ประสงค์ดำเนินคดีตัวจริงไปยังกองคดีธุรกิจการเงินนอกระบบ ทางไปรษณีย์'],
     NO_PROSECUTION_RECEIVED: ['warn', 'เจ้าหน้าที่ได้รับหนังสือแจ้งความไม่ประสงค์ดำเนินคดีของท่านแล้ว'],
     ARRIVED: ['ok', 'ท่านได้ไปให้ปากคำแล้ว ขอบคุณครับ/ค่ะ'],
@@ -192,6 +199,7 @@
     msg('m-status', s[0], s[1]);
     var active = ['SCHEDULED', 'CONFIRMED', 'RESCHEDULED'].indexOf(st.status) >= 0;
     $('m-actions').classList.toggle('hidden', !active);
+    $('m-form').classList.toggle('hidden', st.status !== 'NO_PROSECUTION_PENDING');
     $('btn-confirm').classList.toggle('hidden', st.status === 'CONFIRMED');
     $('btn-resched').classList.toggle('hidden', !st.canReschedule);
     if (active && !st.canReschedule && REASON_TEXT[st.rescheduleReason]) {
