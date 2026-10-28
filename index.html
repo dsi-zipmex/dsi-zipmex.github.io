@@ -49,7 +49,7 @@
   <header>
     <img src="logo.png" alt="ตรากรมสอบสวนคดีพิเศษ">
     <h1>กรมสอบสวนคดีพิเศษ</h1>
-    <p>กองคดีธุรกิจการเงินนอกระบบ<br>การนัดหมายให้ปากคำ · คดีพิเศษที่ ๔๓/๒๕๖๘</p>
+    <p>กองคดีธุรกิจการเงินนอกระบบ<br>การนัดหมายให้ปากคำ · คดีพิเศษที่ 43/2568</p>
   </header>
 
   <section id="v-loading" class="card">กำลังโหลด…</section>
@@ -60,7 +60,7 @@
     <div class="name" id="p-name"></div>
     <div>วันเวลานัด</div>
     <div class="appt" id="p-appt"></div>
-    <label for="pin">กรุณากรอกเลขบัตรประชาชน ๔ ตัวท้าย เพื่อยืนยันตัวตน</label>
+    <label for="pin">กรุณากรอกเลขบัตรประชาชน 4 ตัวท้าย เพื่อยืนยันตัวตน</label>
     <input id="pin" class="pin" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" enterkeyhint="done">
     <div id="pin-msg"></div>
     <button class="primary" id="pin-btn">ยืนยันตัวตน</button>
@@ -118,7 +118,7 @@
     <button class="link" data-back>ย้อนกลับ</button>
   </section>
 
-  <footer>สอบถามเพิ่มเติม โทร <a href="tel:028319888,51194">๐๒-๘๓๑-๙๘๘๘ ต่อ ๕๑๑๙๔</a> หรือ <a href="tel:0951098647">๐๙๕-๑๐๙-๘๖๔๗</a></footer>
+  <footer>สอบถามเพิ่มเติม โทร <a href="tel:028319888,51194">02-831-9888 ต่อ 51194</a> หรือ <a href="tel:0951098647">095-109-8647</a></footer>
 </main>
 
 <script>
@@ -141,7 +141,7 @@
     SCHEDULED: ['info', 'กรุณายืนยันว่าจะไปตามนัด หรือขอเปลี่ยนวันเวลาหากไม่สะดวก'],
     CONFIRMED: ['ok', 'ท่านยืนยันแล้วว่าจะไปตามนัด กรุณานำบัตรประชาชน เอกสารหรืออีเมลที่แสดงรายละเอียดการลงทุน และรายการเดินบัญชี (Statement) ไปด้วย'],
     RESCHEDULED: ['ok', 'เปลี่ยนวันเวลานัดเรียบร้อยแล้ว กรุณานำบัตรประชาชน เอกสารหรืออีเมลที่แสดงรายละเอียดการลงทุน และรายการเดินบัญชี (Statement) ไปด้วย'],
-    NO_PROSECUTION_PENDING: ['warn', 'ระบบบันทึกการแจ้งของท่านแล้ว การแจ้งจะมีผลเมื่อเจ้าหน้าที่ได้รับหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษตัวจริงที่ลงลายมือชื่อแล้ว กรุณาส่งทางไปรษณีย์ไปที่ กองคดีธุรกิจการเงินนอกระบบ กรมสอบสวนคดีพิเศษ เลขที่ ๑๒๘ ถนนแจ้งวัฒนะ แขวงทุ่งสองห้อง เขตหลักสี่ กรุงเทพฯ ๑๐๒๑๐'],
+    NO_PROSECUTION_PENDING: ['warn', 'ระบบบันทึกการแจ้งของท่านแล้ว การแจ้งจะมีผลเมื่อเจ้าหน้าที่ได้รับหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษตัวจริงที่ลงลายมือชื่อแล้ว กรุณาส่งทางไปรษณีย์ไปที่ กองคดีธุรกิจการเงินนอกระบบ กรมสอบสวนคดีพิเศษ เลขที่ 128 ถนนแจ้งวัฒนะ แขวงทุ่งสองห้อง เขตหลักสี่ กรุงเทพฯ 10210'],
     NO_PROSECUTION_RECEIVED: ['warn', 'เจ้าหน้าที่ได้รับหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษของท่านแล้ว'],
     ARRIVED: ['ok', 'ท่านได้ไปให้ปากคำแล้ว ขอบคุณที่ให้ความร่วมมือ'],
   };
@@ -162,6 +162,8 @@
   };
 
   function $(id) { return document.getElementById(id); }
+  // API ส่งวันเวลาเป็นเลขไทย (ตามหมายเรียก) — หน้าเว็บแสดงเป็นเลขอารบิกให้อ่านง่าย
+  function arabic(t) { return String(t || '').replace(/[๐-๙]/g, function (d) { return d.charCodeAt(0) - 0x0E50; }); }
   function show(view) {
     ['loading', 'error', 'pin', 'main', 'resched', 'nopros', 'callback'].forEach(function (v) {
       $('v-' + v).classList.toggle('hidden', v !== view);
@@ -199,8 +201,8 @@
   function render(st) {
     current = st;
     $('m-name').textContent = st.maskedName;
-    $('m-appt').textContent = st.appointment;
-    $('m-place').textContent = st.place;
+    $('m-appt').textContent = arabic(st.appointment);
+    $('m-place').textContent = arabic(st.place);
     var s = STATUS_TEXT[st.status] || ['', ''];
     msg('m-status', s[0], s[1]);
     msg('m-notice', '', '');
@@ -232,7 +234,7 @@
       var radio = document.createElement('input');
       radio.type = 'radio'; radio.name = 'slot'; radio.value = o.id;
       var text = document.createElement('span');
-      text.textContent = o.label;
+      text.textContent = arabic(o.label);
       var small = document.createElement('small');
       small.textContent = 'ว่าง ' + o.left;
       row.appendChild(radio); row.appendChild(text); row.appendChild(small);
@@ -244,7 +246,7 @@
   $('pin').addEventListener('input', function () { this.value = this.value.replace(/\D/g, ''); msg('pin-msg', '', ''); });
   $('pin-btn').onclick = function () {
     var pin = $('pin').value;
-    if (pin.length !== 4) return msg('pin-msg', 'bad', 'กรุณากรอกตัวเลข ๔ หลัก');
+    if (pin.length !== 4) return msg('pin-msg', 'bad', 'กรุณากรอกตัวเลข 4 หลัก');
     busy(true);
     msg('pin-msg', 'info', 'กำลังตรวจสอบ…');
     api('verify', [TOKEN, pin]).then(function (res) {
@@ -252,7 +254,7 @@
       if (res.ok) { session = res.session; return render(res); }
       if (res.error === 'LOCKED') return showError('LOCKED');
       if (res.error === 'WRONG') return msg('pin-msg', 'bad', 'เลขบัตรไม่ถูกต้อง (เหลือ ' + res.remaining + ' ครั้ง)');
-      msg('pin-msg', 'bad', ERROR_TEXT[res.error] || 'กรุณากรอกตัวเลข ๔ หลัก');
+      msg('pin-msg', 'bad', ERROR_TEXT[res.error] || 'กรุณากรอกตัวเลข 4 หลัก');
     }).catch(fail('pin-msg'));
   };
   $('btn-confirm').onclick = function () {
@@ -281,14 +283,14 @@
   };
   document.querySelectorAll('[data-back]').forEach(function (b) { b.onclick = function () { show('main'); }; });
 
-  $('n-address').textContent = 'กองคดีธุรกิจการเงินนอกระบบ กรมสอบสวนคดีพิเศษ เลขที่ ๑๒๘ ถนนแจ้งวัฒนะ แขวงทุ่งสองห้อง เขตหลักสี่ กรุงเทพฯ ๑๐๒๑๐';
+  $('n-address').textContent = 'กองคดีธุรกิจการเงินนอกระบบ กรมสอบสวนคดีพิเศษ เลขที่ 128 ถนนแจ้งวัฒนะ แขวงทุ่งสองห้อง เขตหลักสี่ กรุงเทพฯ 10210';
   if (!TOKEN) {
     showError('NOT_FOUND');
   } else {
     api('preview', [TOKEN]).then(function (res) {
       if (!res.ok) return showError(res.error);
       $('p-name').textContent = res.maskedName;
-      $('p-appt').textContent = res.appointment;
+      $('p-appt').textContent = arabic(res.appointment);
       show('pin');
       $('pin').focus();
     }).catch(function () { showError('NOT_FOUND'); });
