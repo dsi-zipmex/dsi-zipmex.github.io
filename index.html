@@ -33,6 +33,10 @@
   .msg.ok { background:#e8f5ec; color:var(--ok); }
   .msg.warn { background:#fff4e0; color:var(--warn); }
   .msg.bad { background:#fdecea; color:var(--bad); }
+  .msg.info { background:#eef2fb; color:var(--brand); }
+  .addr { background:var(--bg); border-radius:8px; padding:12px; font-weight:600; margin:8px 0; }
+  .maplink { display:inline-block; margin-top:4px; color:var(--brand); font-weight:600; }
+  footer a { color:inherit; }
   .slot { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:12px; border:1px solid var(--line); border-radius:8px; margin-top:8px; cursor:pointer; }
   .slot input { width:auto; }
   .slot small { color:var(--muted); white-space:nowrap; }
@@ -57,17 +61,17 @@
     <div>วันเวลานัด</div>
     <div class="appt" id="p-appt"></div>
     <label for="pin">กรุณากรอกเลขบัตรประชาชน ๔ ตัวท้าย เพื่อยืนยันตัวตน</label>
-    <input id="pin" class="pin" inputmode="numeric" maxlength="4" autocomplete="off">
+    <input id="pin" class="pin" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" enterkeyhint="done">
     <div id="pin-msg"></div>
     <button class="primary" id="pin-btn">ยืนยันตัวตน</button>
   </section>
 
   <section id="v-main" class="card hidden">
     <div class="name" id="m-name"></div>
-    <div>วันเวลานัดของท่าน</div>
+    <div>วันเวลานัด</div>
     <div class="appt" id="m-appt"></div>
-    <div style="font-size:16px;color:var(--muted);margin-top:6px">สถานที่: <a id="m-place" href="https://maps.app.goo.gl/L9F37NFZwfWs8qNb7" target="_blank" rel="noopener"></a></div>
-    <a class="btnlink" href="https://maps.app.goo.gl/L9F37NFZwfWs8qNb7" target="_blank" rel="noopener">เปิดแผนที่นำทาง</a>
+    <div style="font-size:16px;color:var(--muted);margin-top:6px">สถานที่: <span id="m-place"></span><br>
+      <a class="maplink" href="https://maps.app.goo.gl/L9F37NFZwfWs8qNb7" target="_blank" rel="noopener">เปิดแผนที่นำทาง (Google Maps)</a></div>
     <div id="m-status"></div>
     <div id="m-actions">
       <button class="primary" id="btn-confirm">ยืนยันว่าจะไปตามนัด</button>
@@ -75,6 +79,7 @@
       <button class="danger" id="btn-nopros">ไม่ประสงค์ดำเนินคดี</button>
     </div>
     <button class="link" id="btn-callback">ต้องการให้เจ้าหน้าที่โทรกลับ</button>
+    <div id="m-notice"></div>
   </section>
 
   <section id="v-resched" class="card hidden">
@@ -88,10 +93,11 @@
 
   <section id="v-nopros" class="card hidden">
     <div class="name">แจ้งไม่ประสงค์ดำเนินคดี</div>
-    <p>กรุณากรอก<b>หนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษ</b>ที่แนบมากับหมายเรียก ลงลายมือชื่อ แนบสำเนาบัตรประชาชนที่รับรองสำเนาถูกต้อง แล้วส่งไปที่</p>
-    <p style="font-size:16px;color:var(--muted)">หากไม่ได้รับหนังสือหรือเอกสารสูญหาย สามารถดาวน์โหลดไปพิมพ์และกรอกได้ที่ลิงก์นี้</p>
+    <p>กรุณากรอก<b>หนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษ</b>ที่แนบมากับหมายเรียก ลงลายมือชื่อ แนบสำเนาบัตรประชาชนที่รับรองสำเนาถูกต้อง แล้วส่งทางไปรษณีย์ไปที่</p>
+    <div class="addr" id="n-address"></div>
+    <p style="font-size:16px;color:var(--muted);margin-bottom:0">หากไม่ได้รับหนังสือหรือเอกสารสูญหาย สามารถดาวน์โหลดไปพิมพ์และกรอกได้ที่ลิงก์นี้</p>
     <a class="btnlink" href="https://drive.google.com/file/d/1RijOHd4XjipTJcfeYXu9B-LrpygupMcJ/view?usp=sharing" target="_blank" rel="noopener">ดาวน์โหลดหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษ</a>
-    <p id="n-address" style="font-weight:600"></p>
+    <p style="font-size:16px;color:var(--muted)">เมื่อจัดส่งเอกสารแล้ว หรือพร้อมจะจัดส่ง กรุณากดปุ่มด้านล่างเพื่อแจ้งให้เจ้าหน้าที่ทราบ</p>
     <label for="n-phone">เบอร์โทรศัพท์ที่ติดต่อได้ (ไม่บังคับ)</label>
     <input id="n-phone" inputmode="tel" maxlength="20">
     <label for="n-note">หมายเหตุ (ไม่บังคับ)</label>
@@ -112,7 +118,7 @@
     <button class="link" data-back>ย้อนกลับ</button>
   </section>
 
-  <footer>สอบถามเพิ่มเติม โทร <span id="phone">๐๒-๘๓๑-๙๘๘๘ ต่อ ๕๑๑๙๔ , ๐๙๕-๑๐๙-๘๖๔๗</span></footer>
+  <footer>สอบถามเพิ่มเติม โทร <a href="tel:028319888,51194">๐๒-๘๓๑-๙๘๘๘ ต่อ ๕๑๑๙๔</a> หรือ <a href="tel:0951098647">๐๙๕-๑๐๙-๘๖๔๗</a></footer>
 </main>
 
 <script>
@@ -132,12 +138,12 @@
   }
   var session = null, current = null;
   var STATUS_TEXT = {
-    SCHEDULED: ['', ''],
+    SCHEDULED: ['info', 'กรุณายืนยันว่าจะไปตามนัด หรือขอเปลี่ยนวันเวลาหากไม่สะดวก'],
     CONFIRMED: ['ok', 'ท่านยืนยันแล้วว่าจะไปตามนัด กรุณานำบัตรประชาชน เอกสารหรืออีเมลที่แสดงรายละเอียดการลงทุน และรายการเดินบัญชี (Statement) ไปด้วย'],
     RESCHEDULED: ['ok', 'เปลี่ยนวันเวลานัดเรียบร้อยแล้ว กรุณานำบัตรประชาชน เอกสารหรืออีเมลที่แสดงรายละเอียดการลงทุน และรายการเดินบัญชี (Statement) ไปด้วย'],
-    NO_PROSECUTION_PENDING: ['warn', 'ระบบบันทึกการแจ้งของท่านแล้ว การแจ้งจะมีผลเมื่อเจ้าหน้าที่ได้รับหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษตัวจริงที่ลงลายมือชื่อแล้ว กรุณาส่งไปยังกองคดีธุรกิจการเงินนอกระบบ ทางไปรษณีย์'],
+    NO_PROSECUTION_PENDING: ['warn', 'ระบบบันทึกการแจ้งของท่านแล้ว การแจ้งจะมีผลเมื่อเจ้าหน้าที่ได้รับหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษตัวจริงที่ลงลายมือชื่อแล้ว กรุณาส่งทางไปรษณีย์ไปที่ กองคดีธุรกิจการเงินนอกระบบ กรมสอบสวนคดีพิเศษ เลขที่ ๑๒๘ ถนนแจ้งวัฒนะ แขวงทุ่งสองห้อง เขตหลักสี่ กรุงเทพฯ ๑๐๒๑๐'],
     NO_PROSECUTION_RECEIVED: ['warn', 'เจ้าหน้าที่ได้รับหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษของท่านแล้ว'],
-    ARRIVED: ['ok', 'ท่านได้ไปให้ปากคำแล้ว ขอบคุณครับ/ค่ะ'],
+    ARRIVED: ['ok', 'ท่านได้ไปให้ปากคำแล้ว ขอบคุณที่ให้ความร่วมมือ'],
   };
   var REASON_TEXT = {
     MAX_CHANGES: 'ท่านเปลี่ยนวันนัดครบจำนวนครั้งที่กำหนดแล้ว หากต้องการเปลี่ยนอีก กรุณากด "ต้องการให้เจ้าหน้าที่โทรกลับ"',
@@ -175,6 +181,7 @@
   }
   function call(name, args, onOk, msgId) {
     busy(true);
+    msg(msgId, 'info', 'กำลังบันทึก…');
     api(name, args).then(function (res) {
       busy(false);
       if (!res || !res.ok) {
@@ -196,6 +203,7 @@
     $('m-place').textContent = st.place;
     var s = STATUS_TEXT[st.status] || ['', ''];
     msg('m-status', s[0], s[1]);
+    msg('m-notice', '', '');
     var active = ['SCHEDULED', 'CONFIRMED', 'RESCHEDULED'].indexOf(st.status) >= 0;
     $('m-actions').classList.toggle('hidden', !active);
     $('btn-confirm').classList.toggle('hidden', st.status === 'CONFIRMED');
@@ -232,11 +240,13 @@
     });
   }
 
+  $('pin').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('pin-btn').click(); });
   $('pin').addEventListener('input', function () { this.value = this.value.replace(/\D/g, ''); msg('pin-msg', '', ''); });
   $('pin-btn').onclick = function () {
     var pin = $('pin').value;
     if (pin.length !== 4) return msg('pin-msg', 'bad', 'กรุณากรอกตัวเลข ๔ หลัก');
     busy(true);
+    msg('pin-msg', 'info', 'กำลังตรวจสอบ…');
     api('verify', [TOKEN, pin]).then(function (res) {
       busy(false);
       if (res.ok) { session = res.session; return render(res); }
@@ -256,8 +266,9 @@
   };
   $('btn-nopros').onclick = function () { show('nopros'); };
   $('n-save').onclick = function () {
+    if (!window.confirm('ยืนยันแจ้งว่าไม่ประสงค์ดำเนินคดี?
+การแจ้งจะมีผลเมื่อเจ้าหน้าที่ได้รับหนังสือตัวจริงที่ลงลายมือชื่อแล้ว')) return;
     call('noProsecution', [session, $('n-phone').value, $('n-note').value], function (res) {
-      $('n-address').textContent = res.returnAddress;
       render(res);
     }, 'n-msg');
   };
@@ -265,8 +276,8 @@
   $('c-save').onclick = function () {
     if ($('c-phone').value.replace(/\D/g, '').length < 9) return msg('c-msg', 'bad', ERROR_TEXT.PHONE);
     call('requestCallback', [session, $('c-phone').value, $('c-note').value], function () {
-      msg('m-status', 'ok', 'ได้รับคำขอแล้ว เจ้าหน้าที่จะโทรกลับโดยเร็ว');
       show('main');
+      msg('m-notice', 'ok', 'ได้รับคำขอแล้ว เจ้าหน้าที่จะโทรกลับโดยเร็ว');
     }, 'c-msg');
   };
   document.querySelectorAll('[data-back]').forEach(function (b) { b.onclick = function () { show('main'); }; });
