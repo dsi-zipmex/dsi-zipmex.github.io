@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<title>ยืนยันการนัดหมาย กรมสอบสวนคดีพิเศษ</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1d2433; --muted:#5b6475; --line:#d9dee7; --bg:#f4f6f9; --brand:#1f3c88; --ok:#17713a; --warn:#9a5b00; --bad:#b42318; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:18px/1.6 'Sarabun',sans-serif; }
+  main { max-width:520px; margin:0 auto; padding:16px; }
+  header { text-align:center; padding:12px 0 4px; }
+  header h1 { font-size:20px; margin:0; color:var(--brand); font-weight:600; }
+  header p { margin:2px 0 0; color:var(--muted); font-size:15px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:18px; margin:14px 0; }
+  .name { font-size:20px; font-weight:600; }
+  .appt { font-size:18px; color:var(--brand); font-weight:600; }
+  label { display:block; font-size:16px; color:var(--muted); margin:10px 0 4px; }
+  input, textarea, select { width:100%; font:inherit; padding:12px; border:1px solid var(--line); border-radius:8px; }
+  input.pin { font-size:28px; letter-spacing:12px; text-align:center; }
+  button { width:100%; font:inherit; font-weight:600; padding:14px; margin-top:10px; border:0; border-radius:10px; cursor:pointer; }
+  .primary { background:var(--brand); color:#fff; }
+  .secondary { background:#fff; color:var(--brand); border:1px solid var(--brand); }
+  .danger { background:#fff; color:var(--bad); border:1px solid var(--bad); }
+  .link { background:none; color:var(--muted); font-weight:400; text-decoration:underline; }
+  button:disabled { opacity:.5; cursor:default; }
+  .msg { padding:12px; border-radius:8px; margin-top:10px; font-size:16px; }
+  .msg.ok { background:#e8f5ec; color:var(--ok); }
+  .msg.warn { background:#fff4e0; color:var(--warn); }
+  .msg.bad { background:#fdecea; color:var(--bad); }
+  .slot { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:12px; border:1px solid var(--line); border-radius:8px; margin-top:8px; cursor:pointer; }
+  .slot input { width:auto; }
+  .slot small { color:var(--muted); white-space:nowrap; }
+  .hidden { display:none; }
+  footer { text-align:center; color:var(--muted); font-size:15px; padding:8px 0 24px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>กรมสอบสวนคดีพิเศษ</h1>
+    <p>กองคดีธุรกิจการเงินนอกระบบ · การนัดหมายให้ปากคำ</p>
+  </header>
+
+  <section id="v-loading" class="card">กำลังโหลด…</section>
+
+  <section id="v-error" class="card hidden"><div id="error-text" class="msg bad"></div></section>
+
+  <section id="v-pin" class="card hidden">
+    <div class="name" id="p-name"></div>
+    <div>วันเวลานัด</div>
+    <div class="appt" id="p-appt"></div>
+    <label for="pin">กรุณากรอกเลขบัตรประชาชน ๔ ตัวท้าย เพื่อยืนยันตัวตน</label>
+    <input id="pin" class="pin" inputmode="numeric" maxlength="4" autocomplete="off">
+    <div id="pin-msg"></div>
+    <button class="primary" id="pin-btn">ยืนยันตัวตน</button>
+  </section>
+
+  <section id="v-main" class="card hidden">
+    <div class="name" id="m-name"></div>
+    <div>วันเวลานัดของท่าน</div>
+    <div class="appt" id="m-appt"></div>
+    <div style="font-size:16px;color:var(--muted);margin-top:6px">สถานที่: <span id="m-place"></span></div>
+    <div id="m-status"></div>
+    <div id="m-actions">
+      <button class="primary" id="btn-confirm">ยืนยันว่าจะไปตามนัด</button>
+      <button class="secondary" id="btn-resched">ขอเปลี่ยนวันเวลา</button>
+      <button class="danger" id="btn-nopros">ไม่ประสงค์ดำเนินคดี</button>
+    </div>
+    <button class="link" id="btn-callback">ต้องการให้เจ้าหน้าที่โทรกลับ</button>
+  </section>
+
+  <section id="v-resched" class="card hidden">
+    <div class="name">เลือกวันเวลาใหม่</div>
+    <div id="r-note" style="color:var(--muted);font-size:16px"></div>
+    <div id="r-list"></div>
+    <div id="r-msg"></div>
+    <button class="primary" id="r-save">บันทึกวันเวลาใหม่</button>
+    <button class="link" data-back>ย้อนกลับ</button>
+  </section>
+
+  <section id="v-nopros" class="card hidden">
+    <div class="name">แจ้งไม่ประสงค์ดำเนินคดี</div>
+    <p>กรุณากรอก<b>หนังสือแจ้งความไม่ประสงค์ดำเนินคดี</b>ที่แนบมากับหมายเรียก ลงลายมือชื่อ แนบสำเนาบัตรประชาชนที่รับรองสำเนาถูกต้อง แล้วส่งไปที่</p>
+    <p id="n-address" style="font-weight:600"></p>
+    <label for="n-phone">เบอร์โทรศัพท์ที่ติดต่อได้ (ไม่บังคับ)</label>
+    <input id="n-phone" inputmode="tel" maxlength="20">
+    <label for="n-note">หมายเหตุ (ไม่บังคับ)</label>
+    <textarea id="n-note" rows="2" maxlength="300"></textarea>
+    <div id="n-msg"></div>
+    <button class="danger" id="n-save">ยืนยันว่าไม่ประสงค์ดำเนินคดี</button>
+    <button class="link" data-back>ย้อนกลับ</button>
+  </section>
+
+  <section id="v-callback" class="card hidden">
+    <div class="name">ให้เจ้าหน้าที่โทรกลับ</div>
+    <label for="c-phone">เบอร์โทรศัพท์</label>
+    <input id="c-phone" inputmode="tel" maxlength="20">
+    <label for="c-note">ช่วงเวลาที่สะดวก / เรื่องที่ต้องการแจ้ง</label>
+    <textarea id="c-note" rows="3" maxlength="300"></textarea>
+    <div id="c-msg"></div>
+    <button class="primary" id="c-save">ส่งคำขอ</button>
+    <button class="link" data-back>ย้อนกลับ</button>
+  </section>
+
+  <footer>สอบถามเพิ่มเติม โทร <span id="phone">๐๒-๘๓๑-๙๘๘๘ ต่อ ๕๑๑๙๔ , ๐๙๕-๑๐๙-๘๖๔๗</span></footer>
+</main>
+
+<script>
+  // หน้าเว็บนี้อยู่บน GitHub Pages และเรียก Apps Script (zipmex.dsi.public@gmail.com) แบบไม่ส่ง cookie
+  var API_URL = 'https://script.google.com/macros/s/AKfycbwD2IL-ZwdIUwEVx916EZHyLvBXO8-p9m_tPP4j7VjP_PPNgbhjL5tyO5hxqHFcRgC3zA/exec';
+  var TOKEN = (new URLSearchParams(location.search).get('t') || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64);
+
+  function api(fn, args) {
+    return fetch(API_URL, {
+      method: 'POST', credentials: 'omit', redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ fn: fn, args: args })
+    }).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+  }
+  var session = null, current = null;
+  var STATUS_TEXT = {
+    SCHEDULED: ['', ''],
+    CONFIRMED: ['ok', 'ท่านยืนยันแล้วว่าจะไปตามนัด กรุณานำบัตรประชาชน หมายเรียกฉบับนี้ และรายการเดินบัญชี (Statement) ไปด้วย'],
+    RESCHEDULED: ['ok', 'เปลี่ยนวันเวลานัดเรียบร้อยแล้ว กรุณานำบัตรประชาชน หมายเรียกฉบับนี้ และรายการเดินบัญชี (Statement) ไปด้วย'],
+    NO_PROSECUTION_PENDING: ['warn', 'ระบบบันทึกว่าท่านไม่ประสงค์ดำเนินคดีแล้ว กรุณาส่งหนังสือแจ้งความไม่ประสงค์ดำเนินคดีตัวจริงไปยังกองคดีธุรกิจการเงินนอกระบบ ทางไปรษณีย์'],
+    NO_PROSECUTION_RECEIVED: ['warn', 'เจ้าหน้าที่ได้รับหนังสือแจ้งความไม่ประสงค์ดำเนินคดีของท่านแล้ว'],
+    ARRIVED: ['ok', 'ท่านได้ไปให้ปากคำแล้ว ขอบคุณครับ/ค่ะ'],
+  };
+  var REASON_TEXT = {
+    MAX_CHANGES: 'ท่านเปลี่ยนวันนัดครบจำนวนครั้งที่กำหนดแล้ว หากต้องการเปลี่ยนอีก กรุณากด "ต้องการให้เจ้าหน้าที่โทรกลับ"',
+    TOO_LATE: 'ไม่สามารถเปลี่ยนวันนัดผ่านระบบได้ เนื่องจากใกล้วันนัดแล้ว กรุณาโทรติดต่อเจ้าหน้าที่',
+    STATUS: '',
+  };
+  var ERROR_TEXT = {
+    NOT_FOUND: 'ไม่พบข้อมูลการนัดหมาย กรุณาสแกน QR code บนหมายเรียกอีกครั้ง หรือโทรติดต่อเจ้าหน้าที่',
+    LOCKED: 'รายการนี้ถูกระงับชั่วคราวเนื่องจากกรอกข้อมูลไม่ถูกต้องหลายครั้ง กรุณาโทรติดต่อเจ้าหน้าที่',
+    SESSION: 'หมดเวลาการใช้งาน กรุณาโหลดหน้านี้ใหม่',
+    BUSY: 'ระบบมีผู้ใช้งานจำนวนมาก กรุณาลองใหม่อีกครั้ง',
+    SLOT_FULL: 'รอบที่เลือกเต็มแล้ว กรุณาเลือกรอบอื่น',
+    NOT_ALLOWED: 'ไม่สามารถเปลี่ยนวันนัดได้',
+    PHONE: 'กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง',
+    STATUS: 'ไม่สามารถทำรายการนี้ได้ในสถานะปัจจุบัน',
+  };
+
+  function $(id) { return document.getElementById(id); }
+  function show(view) {
+    ['loading', 'error', 'pin', 'main', 'resched', 'nopros', 'callback'].forEach(function (v) {
+      $('v-' + v).classList.toggle('hidden', v !== view);
+    });
+    window.scrollTo(0, 0);
+  }
+  function msg(id, kind, text) {
+    var el = $(id);
+    el.className = text ? 'msg ' + kind : '';
+    el.textContent = text || '';
+  }
+  function fail(id) {
+    return function (err) { msg(id, 'bad', 'เกิดข้อผิดพลาด กรุณาลองใหม่ หรือโทรติดต่อเจ้าหน้าที่'); busy(false); };
+  }
+  function busy(on) {
+    document.querySelectorAll('button').forEach(function (b) { b.disabled = on; });
+  }
+  function call(name, args, onOk, msgId) {
+    busy(true);
+    api(name, args).then(function (res) {
+      busy(false);
+      if (!res || !res.ok) {
+        if (res && (res.error === 'LOCKED' || res.error === 'SESSION')) return showError(res.error);
+        return msg(msgId, 'bad', (res && ERROR_TEXT[res.error]) || 'ไม่สามารถทำรายการได้');
+      }
+      onOk(res);
+    }).catch(fail(msgId));
+  }
+  function showError(code) {
+    $('error-text').textContent = ERROR_TEXT[code] || ERROR_TEXT.NOT_FOUND;
+    show('error');
+  }
+
+  function render(st) {
+    current = st;
+    $('m-name').textContent = st.maskedName;
+    $('m-appt').textContent = st.appointment;
+    $('m-place').textContent = st.place;
+    var s = STATUS_TEXT[st.status] || ['', ''];
+    msg('m-status', s[0], s[1]);
+    var active = ['SCHEDULED', 'CONFIRMED', 'RESCHEDULED'].indexOf(st.status) >= 0;
+    $('m-actions').classList.toggle('hidden', !active);
+    $('btn-confirm').classList.toggle('hidden', st.status === 'CONFIRMED');
+    $('btn-resched').classList.toggle('hidden', !st.canReschedule);
+    if (active && !st.canReschedule && REASON_TEXT[st.rescheduleReason]) {
+      msg('m-status', 'warn', (s[1] ? s[1] + ' — ' : '') + REASON_TEXT[st.rescheduleReason]);
+    }
+    show('main');
+  }
+
+  function renderSlots() {
+    var left = current.maxChanges - current.changeCount;
+    $('r-note').textContent = 'เปลี่ยนได้อีก ' + left + ' ครั้ง · แสดงเฉพาะรอบที่ยังว่าง';
+    var list = $('r-list');
+    list.innerHTML = '';
+    if (!current.options.length) {
+      msg('r-msg', 'warn', 'ขณะนี้ไม่มีรอบว่าง กรุณากด "ต้องการให้เจ้าหน้าที่โทรกลับ"');
+      $('r-save').classList.add('hidden');
+      return;
+    }
+    $('r-save').classList.remove('hidden');
+    msg('r-msg', '', '');
+    current.options.forEach(function (o) {
+      var row = document.createElement('label');
+      row.className = 'slot';
+      var radio = document.createElement('input');
+      radio.type = 'radio'; radio.name = 'slot'; radio.value = o.id;
+      var text = document.createElement('span');
+      text.textContent = o.label;
+      var small = document.createElement('small');
+      small.textContent = 'ว่าง ' + o.left;
+      row.appendChild(radio); row.appendChild(text); row.appendChild(small);
+      list.appendChild(row);
+    });
+  }
+
+  $('pin').addEventListener('input', function () { this.value = this.value.replace(/\D/g, ''); msg('pin-msg', '', ''); });
+  $('pin-btn').onclick = function () {
+    var pin = $('pin').value;
+    if (pin.length !== 4) return msg('pin-msg', 'bad', 'กรุณากรอกตัวเลข ๔ หลัก');
+    busy(true);
+    api('verify', [TOKEN, pin]).then(function (res) {
+      busy(false);
+      if (res.ok) { session = res.session; return render(res); }
+      if (res.error === 'LOCKED') return showError('LOCKED');
+      if (res.error === 'WRONG') return msg('pin-msg', 'bad', 'เลขบัตรไม่ถูกต้อง (เหลือ ' + res.remaining + ' ครั้ง)');
+      msg('pin-msg', 'bad', ERROR_TEXT[res.error] || 'กรุณากรอกตัวเลข ๔ หลัก');
+    }).catch(fail('pin-msg'));
+  };
+  $('btn-confirm').onclick = function () {
+    call('confirmAttendance', [session], render, 'm-status');
+  };
+  $('btn-resched').onclick = function () { renderSlots(); show('resched'); };
+  $('r-save').onclick = function () {
+    var picked = document.querySelector('input[name=slot]:checked');
+    if (!picked) return msg('r-msg', 'bad', 'กรุณาเลือกวันเวลา');
+    call('reschedule', [session, picked.value], render, 'r-msg');
+  };
+  $('btn-nopros').onclick = function () { show('nopros'); };
+  $('n-save').onclick = function () {
+    call('noProsecution', [session, $('n-phone').value, $('n-note').value], function (res) {
+      $('n-address').textContent = res.returnAddress;
+      render(res);
+    }, 'n-msg');
+  };
+  $('btn-callback').onclick = function () { show('callback'); };
+  $('c-save').onclick = function () {
+    if ($('c-phone').value.replace(/\D/g, '').length < 9) return msg('c-msg', 'bad', ERROR_TEXT.PHONE);
+    call('requestCallback', [session, $('c-phone').value, $('c-note').value], function () {
+      msg('m-status', 'ok', 'ได้รับคำขอแล้ว เจ้าหน้าที่จะโทรกลับโดยเร็ว');
+      show('main');
+    }, 'c-msg');
+  };
+  document.querySelectorAll('[data-back]').forEach(function (b) { b.onclick = function () { show('main'); }; });
+
+  $('n-address').textContent = 'กองคดีธุรกิจการเงินนอกระบบ กรมสอบสวนคดีพิเศษ เลขที่ ๑๒๘ ถนนแจ้งวัฒนะ แขวงทุ่งสองห้อง เขตหลักสี่ กรุงเทพฯ ๑๐๒๑๐';
+  if (!TOKEN) {
+    showError('NOT_FOUND');
+  } else {
+    api('preview', [TOKEN]).then(function (res) {
+      if (!res.ok) return showError(res.error);
+      $('p-name').textContent = res.maskedName;
+      $('p-appt').textContent = res.appointment;
+      show('pin');
+      $('pin').focus();
+    }).catch(function () { showError('NOT_FOUND'); });
+  }
+</script>
+</body>
+</html>
