@@ -43,9 +43,9 @@
 <body>
 <main>
   <header>
-    <img src="logo.jpg" alt="ตรากรมสอบสวนคดีพิเศษ">
+    <img src="logo.png" alt="ตรากรมสอบสวนคดีพิเศษ">
     <h1>กรมสอบสวนคดีพิเศษ</h1>
-    <p>กองคดีธุรกิจการเงินนอกระบบ · การนัดหมายให้ปากคำ</p>
+    <p>กองคดีธุรกิจการเงินนอกระบบ<br>การนัดหมายให้ปากคำ · คดีพิเศษที่ ๔๓/๒๕๖๘</p>
   </header>
 
   <section id="v-loading" class="card">กำลังโหลด…</section>
@@ -69,7 +69,6 @@
     <div style="font-size:16px;color:var(--muted);margin-top:6px">สถานที่: <a id="m-place" href="https://maps.app.goo.gl/L9F37NFZwfWs8qNb7" target="_blank" rel="noopener"></a></div>
     <a class="btnlink" href="https://maps.app.goo.gl/L9F37NFZwfWs8qNb7" target="_blank" rel="noopener">เปิดแผนที่นำทาง</a>
     <div id="m-status"></div>
-    <a id="m-form" class="btnlink hidden" href="https://drive.google.com/file/d/1RijOHd4XjipTJcfeYXu9B-LrpygupMcJ/view?usp=sharing" target="_blank" rel="noopener">ดาวน์โหลดหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษ</a>
     <div id="m-actions">
       <button class="primary" id="btn-confirm">ยืนยันว่าจะไปตามนัด</button>
       <button class="secondary" id="btn-resched">ขอเปลี่ยนวันเวลา</button>
@@ -98,7 +97,7 @@
     <label for="n-note">หมายเหตุ (ไม่บังคับ)</label>
     <textarea id="n-note" rows="2" maxlength="300"></textarea>
     <div id="n-msg"></div>
-    <button class="danger" id="n-save">ยืนยันว่าไม่ประสงค์ดำเนินคดี</button>
+    <button class="danger" id="n-save">แจ้งว่าไม่ประสงค์ดำเนินคดี (พร้อมส่งเอกสาร)</button>
     <button class="link" data-back>ย้อนกลับ</button>
   </section>
 
@@ -136,7 +135,7 @@
     SCHEDULED: ['', ''],
     CONFIRMED: ['ok', 'ท่านยืนยันแล้วว่าจะไปตามนัด กรุณานำบัตรประชาชน เอกสารหรืออีเมลที่แสดงรายละเอียดการลงทุน และรายการเดินบัญชี (Statement) ไปด้วย'],
     RESCHEDULED: ['ok', 'เปลี่ยนวันเวลานัดเรียบร้อยแล้ว กรุณานำบัตรประชาชน เอกสารหรืออีเมลที่แสดงรายละเอียดการลงทุน และรายการเดินบัญชี (Statement) ไปด้วย'],
-    NO_PROSECUTION_PENDING: ['warn', 'ระบบบันทึกว่าท่านไม่ประสงค์ดำเนินคดีแล้ว กรุณาส่งหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษตัวจริงไปยังกองคดีธุรกิจการเงินนอกระบบ ทางไปรษณีย์'],
+    NO_PROSECUTION_PENDING: ['warn', 'ระบบบันทึกการแจ้งของท่านแล้ว การแจ้งจะมีผลเมื่อเจ้าหน้าที่ได้รับหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษตัวจริงที่ลงลายมือชื่อแล้ว กรุณาส่งไปยังกองคดีธุรกิจการเงินนอกระบบ ทางไปรษณีย์'],
     NO_PROSECUTION_RECEIVED: ['warn', 'เจ้าหน้าที่ได้รับหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษของท่านแล้ว'],
     ARRIVED: ['ok', 'ท่านได้ไปให้ปากคำแล้ว ขอบคุณครับ/ค่ะ'],
   };
@@ -199,7 +198,6 @@
     msg('m-status', s[0], s[1]);
     var active = ['SCHEDULED', 'CONFIRMED', 'RESCHEDULED'].indexOf(st.status) >= 0;
     $('m-actions').classList.toggle('hidden', !active);
-    $('m-form').classList.toggle('hidden', st.status !== 'NO_PROSECUTION_PENDING');
     $('btn-confirm').classList.toggle('hidden', st.status === 'CONFIRMED');
     $('btn-resched').classList.toggle('hidden', !st.canReschedule);
     if (active && !st.canReschedule && REASON_TEXT[st.rescheduleReason]) {
