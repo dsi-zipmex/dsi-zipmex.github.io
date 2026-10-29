@@ -87,7 +87,7 @@
     <div id="r-note" style="color:var(--muted);font-size:16px"></div>
     <div id="r-list"></div>
     <div id="r-msg"></div>
-    <button class="primary" id="r-save">บันทึกวันเวลาใหม่</button>
+    <button class="primary" id="r-save">ยืนยันวันเวลาใหม่</button>
     <button class="link" data-back>ย้อนกลับ</button>
   </section>
 
@@ -98,9 +98,9 @@
     <p style="font-size:16px;color:var(--muted);margin-bottom:0">หากไม่ได้รับหนังสือหรือเอกสารสูญหาย สามารถดาวน์โหลดไปพิมพ์และกรอกได้ที่ลิงก์นี้</p>
     <a class="btnlink" href="https://drive.google.com/file/d/1RijOHd4XjipTJcfeYXu9B-LrpygupMcJ/view?usp=sharing" target="_blank" rel="noopener">ดาวน์โหลดหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษ</a>
     <p style="font-size:16px;color:var(--muted)">เมื่อจัดส่งเอกสารแล้ว หรือพร้อมจะจัดส่ง กรุณากดปุ่มด้านล่างเพื่อแจ้งให้เจ้าหน้าที่ทราบ</p>
-    <label for="n-phone">เบอร์โทรศัพท์ที่ติดต่อได้ (ไม่บังคับ)</label>
+    <label for="n-phone">เบอร์โทรศัพท์ที่ติดต่อได้</label>
     <input id="n-phone" inputmode="tel" maxlength="20">
-    <label for="n-note">หมายเหตุ (ไม่บังคับ)</label>
+    <label for="n-note">เหตุผลที่ไม่ประสงค์ดำเนินคดี</label>
     <textarea id="n-note" rows="2" maxlength="300"></textarea>
     <div id="n-msg"></div>
     <button class="danger" id="n-save">แจ้งว่าไม่ประสงค์ดำเนินคดี (พร้อมส่งเอกสาร)</button>
@@ -140,7 +140,7 @@
   var STATUS_TEXT = {
     SCHEDULED: ['info', 'กรุณายืนยันว่าจะไปตามนัด หรือขอเปลี่ยนวันเวลาหากไม่สะดวก'],
     CONFIRMED: ['ok', 'ท่านยืนยันแล้วว่าจะไปตามนัด กรุณานำบัตรประชาชน เอกสารหรืออีเมลที่แสดงรายละเอียดการใช้บริการ Zip Up / Zip Up+ และรายการเดินบัญชี (Statement) ไปด้วย'],
-    RESCHEDULED: ['ok', 'เปลี่ยนวันเวลานัดเรียบร้อยแล้ว กรุณานำบัตรประชาชน เอกสารหรืออีเมลที่แสดงรายละเอียดการใช้บริการ Zip Up / Zip Up+ และรายการเดินบัญชี (Statement) ไปด้วย'],
+    RESCHEDULED: ['ok', 'เปลี่ยนวันเวลานัดเรียบร้อยแล้ว ระบบถือว่าท่านยืนยันว่าจะไปตามวันเวลาใหม่นี้ ไม่ต้องกดยืนยันอีก กรุณานำบัตรประชาชน เอกสารหรืออีเมลที่แสดงรายละเอียดการใช้บริการ Zip Up / Zip Up+ และรายการเดินบัญชี (Statement) ไปด้วย'],
     NO_PROSECUTION_PENDING: ['warn', 'ระบบบันทึกการแจ้งของท่านแล้ว การแจ้งจะมีผลเมื่อเจ้าหน้าที่ได้รับหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษตัวจริงที่ลงลายมือชื่อแล้ว กรุณาส่งทางไปรษณีย์ไปที่ กองคดีธุรกิจการเงินนอกระบบ กรมสอบสวนคดีพิเศษ เลขที่ 128 ถนนแจ้งวัฒนะ แขวงทุ่งสองห้อง เขตหลักสี่ กรุงเทพฯ 10210'],
     NO_PROSECUTION_RECEIVED: ['warn', 'เจ้าหน้าที่ได้รับหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษของท่านแล้ว'],
     ARRIVED: ['ok', 'ท่านได้ไปให้ปากคำแล้ว ขอบคุณที่ให้ความร่วมมือ'],
@@ -158,6 +158,7 @@
     SLOT_FULL: 'รอบที่เลือกเต็มแล้ว กรุณาเลือกรอบอื่น',
     NOT_ALLOWED: 'ไม่สามารถเปลี่ยนวันนัดได้',
     PHONE: 'กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง',
+    REASON: 'กรุณาระบุเหตุผลที่ไม่ประสงค์ดำเนินคดี',
     STATUS: 'ไม่สามารถทำรายการนี้ได้ในสถานะปัจจุบัน',
   };
 
@@ -208,7 +209,7 @@
     msg('m-notice', '', '');
     var active = ['SCHEDULED', 'CONFIRMED', 'RESCHEDULED'].indexOf(st.status) >= 0;
     $('m-actions').classList.toggle('hidden', !active);
-    $('btn-confirm').classList.toggle('hidden', st.status === 'CONFIRMED');
+    $('btn-confirm').classList.toggle('hidden', st.status === 'CONFIRMED' || st.status === 'RESCHEDULED');
     $('btn-resched').classList.toggle('hidden', !st.canReschedule);
     if (active && !st.canReschedule && REASON_TEXT[st.rescheduleReason]) {
       msg('m-status', 'warn', (s[1] ? s[1] + ' — ' : '') + REASON_TEXT[st.rescheduleReason]);
@@ -218,7 +219,7 @@
 
   function renderSlots() {
     var left = current.maxChanges - current.changeCount;
-    $('r-note').textContent = 'เปลี่ยนได้อีก ' + left + ' ครั้ง · แสดงเฉพาะรอบที่ยังว่าง';
+    $('r-note').textContent = 'เปลี่ยนได้อีก ' + left + ' ครั้ง · แสดงเฉพาะรอบที่ยังว่าง · เมื่อกดยืนยันวันเวลาใหม่แล้ว ไม่ต้องกดยืนยันการไปตามนัดอีก';
     var list = $('r-list');
     list.innerHTML = '';
     if (!current.options.length) {
@@ -268,6 +269,8 @@
   };
   $('btn-nopros').onclick = function () { show('nopros'); };
   $('n-save').onclick = function () {
+    if ($('n-phone').value.replace(/\D/g, '').length < 9) return msg('n-msg', 'bad', ERROR_TEXT.PHONE);
+    if (!$('n-note').value.trim()) return msg('n-msg', 'bad', ERROR_TEXT.REASON);
     if (!window.confirm('ยืนยันแจ้งว่าไม่ประสงค์ดำเนินคดี?\nการแจ้งจะมีผลเมื่อเจ้าหน้าที่ได้รับหนังสือตัวจริงที่ลงลายมือชื่อแล้ว')) return;
     call('noProsecution', [session, $('n-phone').value, $('n-note').value], function (res) {
       render(res);
