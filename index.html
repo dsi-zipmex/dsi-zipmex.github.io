@@ -54,16 +54,20 @@
 
   <section id="v-loading" class="card">กำลังโหลด…</section>
 
-  <section id="v-error" class="card hidden"><div id="error-text" class="msg bad"></div></section>
+  <section id="v-error" class="card hidden">
+    <div id="error-text" class="msg bad"></div>
+    <button class="secondary hidden" id="err-help">ขอให้เจ้าหน้าที่ติดต่อกลับ / Request a call back</button>
+  </section>
 
   <section id="v-pin" class="card hidden">
     <div class="name" id="p-name"></div>
     <div>วันเวลานัด</div>
     <div class="appt" id="p-appt"></div>
-    <label for="pin">กรุณากรอกเลขบัตรประชาชน 4 ตัวท้าย เพื่อยืนยันตัวตน</label>
+    <label for="pin" id="pin-label">กรุณากรอกเลขบัตรประชาชน 4 ตัวท้าย เพื่อยืนยันตัวตน</label>
     <input id="pin" class="pin" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" enterkeyhint="done">
     <div id="pin-msg"></div>
     <button class="primary" id="pin-btn">ยืนยันตัวตน</button>
+    <button class="link" id="btn-help">จำเลขไม่ได้ หรือยืนยันตัวตนไม่ผ่าน? ขอให้เจ้าหน้าที่ติดต่อกลับ</button>
   </section>
 
   <section id="v-main" class="card hidden">
@@ -105,6 +109,20 @@
     <div id="n-msg"></div>
     <button class="danger" id="n-save">แจ้งว่าไม่ประสงค์ดำเนินคดี (พร้อมส่งเอกสาร)</button>
     <button class="link" data-back>ย้อนกลับ</button>
+  </section>
+
+  <section id="v-help" class="card hidden">
+    <div class="name">ขอให้เจ้าหน้าที่ติดต่อกลับ</div>
+    <div style="color:var(--muted);font-size:16px">Request a call back</div>
+    <p style="font-size:16px">เจ้าหน้าที่จะโทรสอบถามเพื่อยืนยันตัวตนและช่วยทำรายการให้ ระหว่างนี้วันนัดเดิมยังมีผล<br>
+      <span style="color:var(--muted)">Our officer will call you to verify your identity. Your current appointment remains valid.</span></p>
+    <label for="h-phone">เบอร์โทรศัพท์ / Phone number</label>
+    <input id="h-phone" inputmode="tel" maxlength="20">
+    <label for="h-note">เรื่องที่ต้องการแจ้ง / Message</label>
+    <textarea id="h-note" rows="3" maxlength="300" placeholder="เช่น เปลี่ยนหนังสือเดินทางเล่มใหม่ / e.g. I have a new passport"></textarea>
+    <div id="h-msg"></div>
+    <button class="primary" id="h-save">ส่งคำขอ / Send</button>
+    <button class="link" id="h-back">ย้อนกลับ / Back</button>
   </section>
 
   <section id="v-callback" class="card hidden">
@@ -160,13 +178,14 @@
     PHONE: 'กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง',
     REASON: 'กรุณาระบุเหตุผลที่ไม่ประสงค์ดำเนินคดี',
     STATUS: 'ไม่สามารถทำรายการนี้ได้ในสถานะปัจจุบัน',
+    HELP_LIMIT: 'ส่งคำขอครบจำนวนแล้ว กรุณาโทรติดต่อเจ้าหน้าที่ตามเบอร์ด้านล่าง / Please call the number below',
   };
 
   function $(id) { return document.getElementById(id); }
   // API ส่งวันเวลาเป็นเลขไทย (ตามหมายเรียก) — หน้าเว็บแสดงเป็นเลขอารบิกให้อ่านง่าย
   function arabic(t) { return String(t || '').replace(/[๐-๙]/g, function (d) { return d.charCodeAt(0) - 0x0E50; }); }
   function show(view) {
-    ['loading', 'error', 'pin', 'main', 'resched', 'nopros', 'callback'].forEach(function (v) {
+    ['loading', 'error', 'pin', 'main', 'resched', 'nopros', 'callback', 'help'].forEach(function (v) {
       $('v-' + v).classList.toggle('hidden', v !== view);
     });
     window.scrollTo(0, 0);
@@ -196,7 +215,28 @@
   }
   function showError(code) {
     $('error-text').textContent = ERROR_TEXT[code] || ERROR_TEXT.NOT_FOUND;
+    $('err-help').classList.toggle('hidden', code !== 'LOCKED');
+    lastView = 'error';
     show('error');
+  }
+
+  // คนไทย: แป้นตัวเลข | ชาวต่างชาติ (เลขหนังสือเดินทาง): แป้นตัวอักษร ไม่แยกตัวพิมพ์
+  var passport = false, lastView = 'pin';
+  function setupPin(idType) {
+    passport = idType === 'PASSPORT';
+    if (!passport) return;
+    var pin = $('pin');
+    pin.setAttribute('inputmode', 'text');
+    pin.removeAttribute('pattern');
+    pin.setAttribute('autocapitalize', 'characters');
+    pin.setAttribute('autocorrect', 'off');
+    pin.setAttribute('spellcheck', 'false');
+    $('pin-label').innerHTML = 'กรุณากรอกเลขหนังสือเดินทาง 4 ตัวท้าย (ตัวอักษรหรือตัวเลข)<br>Please enter the last 4 characters of your passport number';
+    $('pin-btn').textContent = 'ยืนยันตัวตน / Verify';
+    $('btn-help').textContent = 'เปลี่ยนหนังสือเดินทางใหม่ หรือจำเลขไม่ได้? / New passport or forgot the number?';
+  }
+  function cleanPin(v) {
+    return passport ? v.toUpperCase().replace(/[^0-9A-Z]/g, '') : v.replace(/\D/g, '');
   }
 
   function render(st) {
@@ -244,18 +284,19 @@
   }
 
   $('pin').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('pin-btn').click(); });
-  $('pin').addEventListener('input', function () { this.value = this.value.replace(/\D/g, ''); msg('pin-msg', '', ''); });
+  $('pin').addEventListener('input', function () { this.value = cleanPin(this.value); msg('pin-msg', '', ''); });
   $('pin-btn').onclick = function () {
     var pin = $('pin').value;
-    if (pin.length !== 4) return msg('pin-msg', 'bad', 'กรุณากรอกตัวเลข 4 หลัก');
+    var formatMsg = passport ? 'กรุณากรอก 4 ตัวอักษรหรือตัวเลข / Please enter 4 characters' : 'กรุณากรอกตัวเลข 4 หลัก';
+    if (pin.length !== 4) return msg('pin-msg', 'bad', formatMsg);
     busy(true);
     msg('pin-msg', 'info', 'กำลังตรวจสอบ…');
     api('verify', [TOKEN, pin]).then(function (res) {
       busy(false);
       if (res.ok) { session = res.session; return render(res); }
       if (res.error === 'LOCKED') return showError('LOCKED');
-      if (res.error === 'WRONG') return msg('pin-msg', 'bad', 'เลขบัตรไม่ถูกต้อง (เหลือ ' + res.remaining + ' ครั้ง)');
-      msg('pin-msg', 'bad', ERROR_TEXT[res.error] || 'กรุณากรอกตัวเลข 4 หลัก');
+      if (res.error === 'WRONG') return msg('pin-msg', 'bad', (passport ? 'เลขไม่ถูกต้อง / Incorrect' : 'เลขบัตรไม่ถูกต้อง') + ' (เหลือ ' + res.remaining + ' ครั้ง' + (passport ? ' / ' + res.remaining + ' attempts left' : '') + ')');
+      msg('pin-msg', 'bad', ERROR_TEXT[res.error] || formatMsg);
     }).catch(fail('pin-msg'));
   };
   $('btn-confirm').onclick = function () {
@@ -284,6 +325,17 @@
       msg('m-notice', 'ok', 'ได้รับคำขอแล้ว เจ้าหน้าที่จะโทรกลับโดยเร็ว');
     }, 'c-msg');
   };
+  function openHelp() { msg('h-msg', '', ''); $('h-save').classList.remove('hidden'); show('help'); }
+  $('btn-help').onclick = function () { lastView = 'pin'; openHelp(); };
+  $('err-help').onclick = openHelp;
+  $('h-back').onclick = function () { show(lastView); };
+  $('h-save').onclick = function () {
+    if ($('h-phone').value.replace(/\D/g, '').length < 9) return msg('h-msg', 'bad', ERROR_TEXT.PHONE + ' / Please enter a valid phone number');
+    call('requestHelp', [TOKEN, $('h-phone').value, $('h-note').value], function () {
+      msg('h-msg', 'ok', 'ได้รับคำขอแล้ว เจ้าหน้าที่จะติดต่อกลับโดยเร็ว / Request received. We will call you soon.');
+      $('h-save').classList.add('hidden');
+    }, 'h-msg');
+  };
   document.querySelectorAll('[data-back]').forEach(function (b) { b.onclick = function () { show('main'); }; });
 
   $('n-address').textContent = 'กองคดีธุรกิจการเงินนอกระบบ กรมสอบสวนคดีพิเศษ เลขที่ 128 ถนนแจ้งวัฒนะ แขวงทุ่งสองห้อง เขตหลักสี่ กรุงเทพฯ 10210';
@@ -294,6 +346,7 @@
       if (!res.ok) return showError(res.error);
       $('p-name').textContent = res.maskedName;
       $('p-appt').textContent = arabic(res.appointment);
+      setupPin(res.idType);
       show('pin');
       $('pin').focus();
     }).catch(function () { showError('NOT_FOUND'); });
