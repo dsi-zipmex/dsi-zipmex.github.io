@@ -40,6 +40,9 @@
   .slot { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:12px; border:1px solid var(--line); border-radius:8px; margin-top:8px; cursor:pointer; }
   .slot input { width:auto; }
   .slot small { color:var(--muted); white-space:nowrap; }
+  /* ภาษาอังกฤษสำหรับผู้ใช้หนังสือเดินทาง (เพิ่มโดย setupPin) */
+  .en { display:block; font-size:.82em; font-weight:400; opacity:.85; }
+  .msg, .appt { white-space:pre-line; }
   .hidden { display:none; }
   footer { text-align:center; color:var(--muted); font-size:15px; padding:8px 0 24px; }
 </style>
@@ -48,11 +51,11 @@
 <main>
   <header>
     <img src="logo.png" alt="ตรากรมสอบสวนคดีพิเศษ">
-    <h1>กรมสอบสวนคดีพิเศษ</h1>
+    <h1 data-en="Department of Special Investigation (DSI)">กรมสอบสวนคดีพิเศษ</h1>
     <p>กองคดีธุรกิจการเงินนอกระบบ<br>การนัดหมายให้ปากคำ · คดีพิเศษที่ 43/2568</p>
   </header>
 
-  <section id="v-loading" class="card">กำลังโหลด…</section>
+  <section id="v-loading" class="card">กำลังโหลด… <span class="en">Loading…</span></section>
 
   <section id="v-error" class="card hidden">
     <div id="error-text" class="msg bad"></div>
@@ -61,54 +64,54 @@
 
   <section id="v-pin" class="card hidden">
     <div class="name" id="p-name"></div>
-    <div>วันเวลานัด</div>
+    <div data-en="Appointment">วันเวลานัด</div>
     <div class="appt" id="p-appt"></div>
     <label for="pin" id="pin-label">กรุณากรอกเลขบัตรประชาชน 4 ตัวท้าย เพื่อยืนยันตัวตน</label>
     <input id="pin" class="pin" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" enterkeyhint="done">
     <div id="pin-msg"></div>
     <button class="primary" id="pin-btn">ยืนยันตัวตน</button>
-    <button class="link" id="btn-help">จำเลขไม่ได้ หรือยืนยันตัวตนไม่ผ่าน? ขอให้เจ้าหน้าที่ติดต่อกลับ</button>
+    <button class="link" id="btn-help">ยืนยันตัวตนไม่ผ่าน? ขอให้เจ้าหน้าที่ติดต่อกลับ</button>
   </section>
 
   <section id="v-main" class="card hidden">
     <div class="name" id="m-name"></div>
-    <div>วันเวลานัด</div>
+    <div data-en="Appointment">วันเวลานัด</div>
     <div class="appt" id="m-appt"></div>
-    <div style="font-size:16px;color:var(--muted);margin-top:6px">สถานที่: <span id="m-place"></span><br>
-      <a class="maplink" href="https://maps.app.goo.gl/L9F37NFZwfWs8qNb7" target="_blank" rel="noopener">เปิดแผนที่นำทาง (Google Maps)</a></div>
+    <div style="font-size:16px;color:var(--muted);margin-top:6px">สถานที่: <span id="m-place"></span><span id="m-place-en" class="en hidden"></span>
+      <a class="maplink" href="https://maps.app.goo.gl/L9F37NFZwfWs8qNb7" target="_blank" rel="noopener" data-en="Open in Google Maps">เปิดแผนที่นำทาง (Google Maps)</a></div>
     <div id="m-status"></div>
     <div id="m-actions">
-      <button class="primary" id="btn-confirm">ยืนยันว่าจะไปตามนัด</button>
-      <button class="secondary" id="btn-resched">ขอเปลี่ยนวันเวลา</button>
-      <button class="danger" id="btn-nopros">ไม่ประสงค์ดำเนินคดี</button>
+      <button class="primary" id="btn-confirm" data-en="Confirm I will attend">ยืนยันว่าจะไปตามนัด</button>
+      <button class="secondary" id="btn-resched" data-en="Change date / time">ขอเปลี่ยนวันเวลา</button>
+      <button class="danger" id="btn-nopros" data-en="I do not wish to pursue the case">ไม่ประสงค์ดำเนินคดี</button>
     </div>
-    <button class="link" id="btn-callback">ต้องการให้เจ้าหน้าที่โทรกลับ</button>
+    <button class="link" id="btn-callback" data-en="Request a call back">ต้องการให้เจ้าหน้าที่โทรกลับ</button>
     <div id="m-notice"></div>
   </section>
 
   <section id="v-resched" class="card hidden">
-    <div class="name">เลือกวันเวลาใหม่</div>
+    <div class="name" data-en="Choose a new date and time">เลือกวันเวลาใหม่</div>
     <div id="r-note" style="color:var(--muted);font-size:16px"></div>
     <div id="r-list"></div>
     <div id="r-msg"></div>
-    <button class="primary" id="r-save">ยืนยันวันเวลาใหม่</button>
-    <button class="link" data-back>ย้อนกลับ</button>
+    <button class="primary" id="r-save" data-en="Confirm new date / time">ยืนยันวันเวลาใหม่</button>
+    <button class="link" data-back data-en="Back">ย้อนกลับ</button>
   </section>
 
   <section id="v-nopros" class="card hidden">
-    <div class="name">แจ้งไม่ประสงค์ดำเนินคดี</div>
-    <p>กรุณากรอก<b>หนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษ</b>ที่แนบมากับหมายเรียก ลงลายมือชื่อ แนบสำเนาบัตรประชาชนที่รับรองสำเนาถูกต้อง แล้วส่งทางไปรษณีย์ไปที่</p>
+    <div class="name" data-en="Notify that you do not wish to pursue the case">แจ้งไม่ประสงค์ดำเนินคดี</div>
+    <p data-en="Please fill in and sign the attached form (in Thai), attach a certified copy of your ID card or passport, and send it by post to:">กรุณากรอก<b>หนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษ</b>ที่แนบมากับหมายเรียก ลงลายมือชื่อ แนบสำเนาบัตรประชาชนที่รับรองสำเนาถูกต้อง แล้วส่งทางไปรษณีย์ไปที่</p>
     <div class="addr" id="n-address"></div>
-    <p style="font-size:16px;color:var(--muted);margin-bottom:0">หากไม่ได้รับหนังสือหรือเอกสารสูญหาย สามารถดาวน์โหลดไปพิมพ์และกรอกได้ที่ลิงก์นี้</p>
-    <a class="btnlink" href="https://drive.google.com/file/d/1RijOHd4XjipTJcfeYXu9B-LrpygupMcJ/view?usp=sharing" target="_blank" rel="noopener">ดาวน์โหลดหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษ</a>
-    <p style="font-size:16px;color:var(--muted)">เมื่อจัดส่งเอกสารแล้ว หรือพร้อมจะจัดส่ง กรุณากดปุ่มด้านล่างเพื่อแจ้งให้เจ้าหน้าที่ทราบ</p>
-    <label for="n-phone">เบอร์โทรศัพท์ที่ติดต่อได้</label>
+    <p style="font-size:16px;color:var(--muted);margin-bottom:0" data-en="If you did not receive the form or have lost it, you can download and print it here.">หากไม่ได้รับหนังสือหรือเอกสารสูญหาย สามารถดาวน์โหลดไปพิมพ์และกรอกได้ที่ลิงก์นี้</p>
+    <a class="btnlink" href="https://drive.google.com/file/d/1RijOHd4XjipTJcfeYXu9B-LrpygupMcJ/view?usp=sharing" target="_blank" rel="noopener" data-en="Download the form">ดาวน์โหลดหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษ</a>
+    <p style="font-size:16px;color:var(--muted)" data-en="Once you have sent, or are ready to send, the documents, please press the button below to let our officers know.">เมื่อจัดส่งเอกสารแล้ว หรือพร้อมจะจัดส่ง กรุณากดปุ่มด้านล่างเพื่อแจ้งให้เจ้าหน้าที่ทราบ</p>
+    <label for="n-phone" data-en="Contact phone number">เบอร์โทรศัพท์ที่ติดต่อได้</label>
     <input id="n-phone" inputmode="tel" maxlength="20">
-    <label for="n-note">เหตุผลที่ไม่ประสงค์ดำเนินคดี</label>
+    <label for="n-note" data-en="Reason for not wishing to pursue the case">เหตุผลที่ไม่ประสงค์ดำเนินคดี</label>
     <textarea id="n-note" rows="2" maxlength="300"></textarea>
     <div id="n-msg"></div>
-    <button class="danger" id="n-save">แจ้งว่าไม่ประสงค์ดำเนินคดี (พร้อมส่งเอกสาร)</button>
-    <button class="link" data-back>ย้อนกลับ</button>
+    <button class="danger" id="n-save" data-en="Notify (documents to follow by post)">แจ้งว่าไม่ประสงค์ดำเนินคดี (พร้อมส่งเอกสาร)</button>
+    <button class="link" data-back data-en="Back">ย้อนกลับ</button>
   </section>
 
   <section id="v-help" class="card hidden">
@@ -126,17 +129,17 @@
   </section>
 
   <section id="v-callback" class="card hidden">
-    <div class="name">ให้เจ้าหน้าที่โทรกลับ</div>
-    <label for="c-phone">เบอร์โทรศัพท์</label>
+    <div class="name" data-en="Request a call back">ให้เจ้าหน้าที่โทรกลับ</div>
+    <label for="c-phone" data-en="Phone number">เบอร์โทรศัพท์</label>
     <input id="c-phone" inputmode="tel" maxlength="20">
-    <label for="c-note">ช่วงเวลาที่สะดวก / เรื่องที่ต้องการแจ้ง</label>
+    <label for="c-note" data-en="Convenient time / message">ช่วงเวลาที่สะดวก / เรื่องที่ต้องการแจ้ง</label>
     <textarea id="c-note" rows="3" maxlength="300"></textarea>
     <div id="c-msg"></div>
-    <button class="primary" id="c-save">ส่งคำขอ</button>
-    <button class="link" data-back>ย้อนกลับ</button>
+    <button class="primary" id="c-save" data-en="Send">ส่งคำขอ</button>
+    <button class="link" data-back data-en="Back">ย้อนกลับ</button>
   </section>
 
-  <footer>สอบถามเพิ่มเติม โทร <a href="tel:028319888,51194">02-831-9888 ต่อ 51194</a> หรือ <a href="tel:0951098647">095-109-8647</a></footer>
+  <footer>สอบถามเพิ่มเติม <span class="en-inline hidden">/ Enquiries</span> โทร <a href="tel:028319888,51194">02-831-9888 ต่อ 51194</a> หรือ <a href="tel:0951098647">095-109-8647</a></footer>
 </main>
 
 <script>
@@ -155,35 +158,65 @@
     });
   }
   var session = null, current = null;
+  // ข้อความทุกรายการเป็น [ไทย, อังกฤษ] — อังกฤษแสดงเฉพาะผู้ที่ยืนยันด้วยเลขหนังสือเดินทาง (ชาวต่างชาติ)
+  var BRING = ['กรุณานำบัตรประชาชน เอกสารหรืออีเมลที่แสดงรายละเอียดการใช้บริการ Zip Up / Zip Up+ และรายการเดินบัญชี (Statement) ไปด้วย',
+               'Please bring your passport, any documents or emails showing your use of Zip Up / Zip Up+, and your bank statements.'];
+  var RETURN_ADDRESS = 'กองคดีธุรกิจการเงินนอกระบบ กรมสอบสวนคดีพิเศษ เลขที่ 128 ถนนแจ้งวัฒนะ แขวงทุ่งสองห้อง เขตหลักสี่ กรุงเทพฯ 10210';
   var STATUS_TEXT = {
-    SCHEDULED: ['info', 'กรุณายืนยันว่าจะไปตามนัด หรือขอเปลี่ยนวันเวลาหากไม่สะดวก'],
-    CONFIRMED: ['ok', 'ท่านยืนยันแล้วว่าจะไปตามนัด กรุณานำบัตรประชาชน เอกสารหรืออีเมลที่แสดงรายละเอียดการใช้บริการ Zip Up / Zip Up+ และรายการเดินบัญชี (Statement) ไปด้วย'],
-    RESCHEDULED: ['ok', 'เปลี่ยนวันเวลานัดเรียบร้อยแล้ว ระบบถือว่าท่านยืนยันว่าจะไปตามวันเวลาใหม่นี้ ไม่ต้องกดยืนยันอีก กรุณานำบัตรประชาชน เอกสารหรืออีเมลที่แสดงรายละเอียดการใช้บริการ Zip Up / Zip Up+ และรายการเดินบัญชี (Statement) ไปด้วย'],
-    NO_PROSECUTION_PENDING: ['warn', 'ระบบบันทึกการแจ้งของท่านแล้ว การแจ้งจะมีผลเมื่อเจ้าหน้าที่ได้รับหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษตัวจริงที่ลงลายมือชื่อแล้ว กรุณาส่งทางไปรษณีย์ไปที่ กองคดีธุรกิจการเงินนอกระบบ กรมสอบสวนคดีพิเศษ เลขที่ 128 ถนนแจ้งวัฒนะ แขวงทุ่งสองห้อง เขตหลักสี่ กรุงเทพฯ 10210'],
-    NO_PROSECUTION_RECEIVED: ['warn', 'เจ้าหน้าที่ได้รับหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษของท่านแล้ว'],
-    ARRIVED: ['ok', 'ท่านได้ไปให้ปากคำแล้ว ขอบคุณที่ให้ความร่วมมือ'],
+    SCHEDULED: ['info', 'กรุณายืนยันว่าจะไปตามนัด หรือขอเปลี่ยนวันเวลาหากไม่สะดวก',
+                'Please confirm that you will attend, or change the date and time if it is not convenient.'],
+    CONFIRMED: ['ok', 'ท่านยืนยันแล้วว่าจะไปตามนัด ' + BRING[0], 'You have confirmed your attendance. ' + BRING[1]],
+    RESCHEDULED: ['ok', 'เปลี่ยนวันเวลานัดเรียบร้อยแล้ว ระบบถือว่าท่านยืนยันว่าจะไปตามวันเวลาใหม่นี้ ไม่ต้องกดยืนยันอีก ' + BRING[0],
+                  'Your appointment has been changed and is confirmed. No further confirmation is needed. ' + BRING[1]],
+    NO_PROSECUTION_PENDING: ['warn', 'ระบบบันทึกการแจ้งของท่านแล้ว การแจ้งจะมีผลเมื่อเจ้าหน้าที่ได้รับหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษตัวจริงที่ลงลายมือชื่อแล้ว กรุณาส่งทางไปรษณีย์ไปที่ ' + RETURN_ADDRESS,
+                             'Your notice has been recorded. It takes effect only when we receive the signed original form. Please send it by post to the address above.'],
+    NO_PROSECUTION_RECEIVED: ['warn', 'เจ้าหน้าที่ได้รับหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษของท่านแล้ว',
+                              'We have received your signed form.'],
+    ARRIVED: ['ok', 'ท่านได้ไปให้ปากคำแล้ว ขอบคุณที่ให้ความร่วมมือ', 'You have given your statement. Thank you for your cooperation.'],
   };
   var REASON_TEXT = {
-    MAX_CHANGES: 'ท่านเปลี่ยนวันนัดครบจำนวนครั้งที่กำหนดแล้ว หากต้องการเปลี่ยนอีก กรุณากด "ต้องการให้เจ้าหน้าที่โทรกลับ"',
-    TOO_LATE: 'ไม่สามารถเปลี่ยนวันนัดผ่านระบบได้ เนื่องจากใกล้วันนัดแล้ว กรุณาโทรติดต่อเจ้าหน้าที่',
-    STATUS: '',
+    MAX_CHANGES: ['ท่านเปลี่ยนวันนัดครบจำนวนครั้งที่กำหนดแล้ว หากต้องการเปลี่ยนอีก กรุณากด "ต้องการให้เจ้าหน้าที่โทรกลับ"',
+                  'You have reached the maximum number of changes. To change again, please press "Request a call back".'],
+    TOO_LATE: ['ไม่สามารถเปลี่ยนวันนัดผ่านระบบได้ เนื่องจากใกล้วันนัดแล้ว กรุณาโทรติดต่อเจ้าหน้าที่',
+               'The appointment is too close to change online. Please call our officers.'],
   };
   var ERROR_TEXT = {
-    NOT_FOUND: 'ไม่พบข้อมูลการนัดหมาย กรุณาสแกน QR code บนหมายเรียกอีกครั้ง หรือโทรติดต่อเจ้าหน้าที่',
-    LOCKED: 'รายการนี้ถูกระงับชั่วคราวเนื่องจากกรอกข้อมูลไม่ถูกต้องหลายครั้ง กรุณาโทรติดต่อเจ้าหน้าที่',
-    SESSION: 'หมดเวลาการใช้งาน กรุณาโหลดหน้านี้ใหม่',
-    BUSY: 'ระบบมีผู้ใช้งานจำนวนมาก กรุณาลองใหม่อีกครั้ง',
-    SLOT_FULL: 'รอบที่เลือกเต็มแล้ว กรุณาเลือกรอบอื่น',
-    NOT_ALLOWED: 'ไม่สามารถเปลี่ยนวันนัดได้',
-    PHONE: 'กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง',
-    REASON: 'กรุณาระบุเหตุผลที่ไม่ประสงค์ดำเนินคดี',
-    STATUS: 'ไม่สามารถทำรายการนี้ได้ในสถานะปัจจุบัน',
-    HELP_LIMIT: 'ส่งคำขอครบจำนวนแล้ว กรุณาโทรติดต่อเจ้าหน้าที่ตามเบอร์ด้านล่าง / Please call the number below',
+    NOT_FOUND: ['ไม่พบข้อมูลการนัดหมาย กรุณาสแกน QR code บนหมายเรียกอีกครั้ง หรือโทรติดต่อเจ้าหน้าที่',
+                'Appointment not found. Please scan the QR code on the summons again or call our officers.'],
+    LOCKED: ['รายการนี้ถูกระงับชั่วคราวเนื่องจากกรอกข้อมูลไม่ถูกต้องหลายครั้ง กรุณาโทรติดต่อเจ้าหน้าที่',
+             'This record is temporarily locked after several incorrect attempts. Please request a call back or call our officers.'],
+    SESSION: ['หมดเวลาการใช้งาน กรุณาโหลดหน้านี้ใหม่', 'Your session has expired. Please reload this page.'],
+    BUSY: ['ระบบมีผู้ใช้งานจำนวนมาก กรุณาลองใหม่อีกครั้ง', 'The system is busy. Please try again.'],
+    SLOT_FULL: ['รอบที่เลือกเต็มแล้ว กรุณาเลือกรอบอื่น', 'That time is full. Please choose another.'],
+    NOT_ALLOWED: ['ไม่สามารถเปลี่ยนวันนัดได้', 'The appointment cannot be changed.'],
+    PHONE: ['กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง', 'Please enter a valid phone number.'],
+    REASON: ['กรุณาระบุเหตุผลที่ไม่ประสงค์ดำเนินคดี', 'Please give your reason.'],
+    STATUS: ['ไม่สามารถทำรายการนี้ได้ในสถานะปัจจุบัน', 'This action is not available for your appointment.'],
+    HELP_LIMIT: ['ส่งคำขอครบจำนวนแล้ว กรุณาโทรติดต่อเจ้าหน้าที่ตามเบอร์ด้านล่าง', 'Request limit reached. Please call the number below.'],
+    FAILED: ['ไม่สามารถทำรายการได้', 'The request could not be completed.'],
+    NETWORK: ['เกิดข้อผิดพลาด กรุณาลองใหม่ หรือโทรติดต่อเจ้าหน้าที่', 'Something went wrong. Please try again or call our officers.'],
   };
+  var TH_MONTHS = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
 
+  var passport = false, lastView = 'pin';
   function $(id) { return document.getElementById(id); }
+  // ไทย หรือ ไทย + อังกฤษ (ขึ้นบรรทัดใหม่)
+  function L(pair) { return passport && pair[1] ? pair[0] + '\n' + pair[1] : pair[0]; }
+  // ก่อนรู้ประเภทบัตร (หน้าแจ้งข้อผิดพลาด) แสดงทั้งสองภาษา
+  function both(pair) { return pair[0] + '\n' + pair[1]; }
   // API ส่งวันเวลาเป็นเลขไทย (ตามหมายเรียก) — หน้าเว็บแสดงเป็นเลขอารบิกให้อ่านง่าย
   function arabic(t) { return String(t || '').replace(/[๐-๙]/g, function (d) { return d.charCodeAt(0) - 0x0E50; }); }
+  // "วันจันทร์ที่ 16 พฤศจิกายน 2569 เวลา 13.30 น." → "Monday 16 November 2026, 13:30"
+  function englishDate(label) {
+    var m = arabic(label).match(/ที่ (\d+) (\S+) (\d{4}) เวลา (\d+)\.(\d+)/);
+    if (!m) return '';
+    var d = new Date(Number(m[3]) - 543, TH_MONTHS.indexOf(m[2]), Number(m[1]));
+    return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + ', ' + m[4] + ':' + m[5];
+  }
+  function dateText(label) {
+    var th = arabic(label);
+    return passport ? th + '\n' + englishDate(label) : th;
+  }
   function show(view) {
     ['loading', 'error', 'pin', 'main', 'resched', 'nopros', 'callback', 'help'].forEach(function (v) {
       $('v-' + v).classList.toggle('hidden', v !== view);
@@ -196,32 +229,31 @@
     el.textContent = text || '';
   }
   function fail(id) {
-    return function (err) { msg(id, 'bad', 'เกิดข้อผิดพลาด กรุณาลองใหม่ หรือโทรติดต่อเจ้าหน้าที่'); busy(false); };
+    return function () { msg(id, 'bad', L(ERROR_TEXT.NETWORK)); busy(false); };
   }
   function busy(on) {
     document.querySelectorAll('button').forEach(function (b) { b.disabled = on; });
   }
   function call(name, args, onOk, msgId) {
     busy(true);
-    msg(msgId, 'info', 'กำลังบันทึก…');
+    msg(msgId, 'info', L(['กำลังบันทึก…', 'Saving…']));
     api(name, args).then(function (res) {
       busy(false);
       if (!res || !res.ok) {
         if (res && (res.error === 'LOCKED' || res.error === 'SESSION')) return showError(res.error);
-        return msg(msgId, 'bad', (res && ERROR_TEXT[res.error]) || 'ไม่สามารถทำรายการได้');
+        return msg(msgId, 'bad', L((res && ERROR_TEXT[res.error]) || ERROR_TEXT.FAILED));
       }
       onOk(res);
     }).catch(fail(msgId));
   }
   function showError(code) {
-    $('error-text').textContent = ERROR_TEXT[code] || ERROR_TEXT.NOT_FOUND;
+    $('error-text').textContent = both(ERROR_TEXT[code] || ERROR_TEXT.NOT_FOUND);
     $('err-help').classList.toggle('hidden', code !== 'LOCKED');
     lastView = 'error';
     show('error');
   }
 
-  // คนไทย: แป้นตัวเลข | ชาวต่างชาติ (เลขหนังสือเดินทาง): แป้นตัวอักษร ไม่แยกตัวพิมพ์
-  var passport = false, lastView = 'pin';
+  // คนไทย: แป้นตัวเลข | ชาวต่างชาติ (เลขหนังสือเดินทาง): แป้นตัวอักษร ไม่แยกตัวพิมพ์ + ข้อความภาษาอังกฤษทุกหน้า
   function setupPin(idType) {
     passport = idType === 'PASSPORT';
     if (!passport) return;
@@ -234,6 +266,15 @@
     $('pin-label').innerHTML = 'กรุณากรอกเลขหนังสือเดินทาง 4 ตัวท้าย (ตัวอักษรหรือตัวเลข)<br>Please enter the last 4 characters of your passport number';
     $('pin-btn').textContent = 'ยืนยันตัวตน / Verify';
     $('btn-help').textContent = 'เปลี่ยนหนังสือเดินทางใหม่ หรือจำเลขไม่ได้? / New passport or forgot the number?';
+    document.querySelectorAll('[data-en]').forEach(function (el) {
+      var en = document.createElement('span');
+      en.className = 'en';
+      en.textContent = el.getAttribute('data-en');
+      el.appendChild(en);
+    });
+    document.querySelectorAll('.en-inline').forEach(function (el) { el.classList.remove('hidden'); });
+    $('m-place-en').textContent = 'Department of Special Investigation (DSI), Building C, 7th floor, Government Complex, Chaeng Watthana Road, Lak Si, Bangkok';
+    $('m-place-en').classList.remove('hidden');
   }
   function cleanPin(v) {
     return passport ? v.toUpperCase().replace(/[^0-9A-Z]/g, '') : v.replace(/\D/g, '');
@@ -242,28 +283,30 @@
   function render(st) {
     current = st;
     $('m-name').textContent = st.maskedName;
-    $('m-appt').textContent = arabic(st.appointment);
+    $('m-appt').textContent = dateText(st.appointment);
     $('m-place').textContent = arabic(st.place);
-    var s = STATUS_TEXT[st.status] || ['', ''];
-    msg('m-status', s[0], s[1]);
+    var s = STATUS_TEXT[st.status] || ['', '', ''];
+    msg('m-status', s[0], L([s[1], s[2]]));
     msg('m-notice', '', '');
     var active = ['SCHEDULED', 'CONFIRMED', 'RESCHEDULED'].indexOf(st.status) >= 0;
     $('m-actions').classList.toggle('hidden', !active);
     $('btn-confirm').classList.toggle('hidden', st.status === 'CONFIRMED' || st.status === 'RESCHEDULED');
     $('btn-resched').classList.toggle('hidden', !st.canReschedule);
-    if (active && !st.canReschedule && REASON_TEXT[st.rescheduleReason]) {
-      msg('m-status', 'warn', (s[1] ? s[1] + ' — ' : '') + REASON_TEXT[st.rescheduleReason]);
+    var reason = REASON_TEXT[st.rescheduleReason];
+    if (active && !st.canReschedule && reason) {
+      msg('m-status', 'warn', L([(s[1] ? s[1] + ' — ' : '') + reason[0], (s[2] ? s[2] + ' — ' : '') + reason[1]]));
     }
     show('main');
   }
 
   function renderSlots() {
     var left = current.maxChanges - current.changeCount;
-    $('r-note').textContent = 'เปลี่ยนได้อีก ' + left + ' ครั้ง · แสดงเฉพาะรอบที่ยังว่าง · เมื่อกดยืนยันวันเวลาใหม่แล้ว ไม่ต้องกดยืนยันการไปตามนัดอีก';
+    $('r-note').textContent = L(['เปลี่ยนได้อีก ' + left + ' ครั้ง · แสดงเฉพาะรอบที่ยังว่าง · เมื่อกดยืนยันวันเวลาใหม่แล้ว ไม่ต้องกดยืนยันการไปตามนัดอีก',
+                                 'Changes left: ' + left + ' · Only available times are shown · No further confirmation is needed after you confirm the new time.']);
     var list = $('r-list');
     list.innerHTML = '';
     if (!current.options.length) {
-      msg('r-msg', 'warn', 'ขณะนี้ไม่มีรอบว่าง กรุณากด "ต้องการให้เจ้าหน้าที่โทรกลับ"');
+      msg('r-msg', 'warn', L(['ขณะนี้ไม่มีรอบว่าง กรุณากด "ต้องการให้เจ้าหน้าที่โทรกลับ"', 'No times are available. Please press "Request a call back".']));
       $('r-save').classList.add('hidden');
       return;
     }
@@ -275,9 +318,10 @@
       var radio = document.createElement('input');
       radio.type = 'radio'; radio.name = 'slot'; radio.value = o.id;
       var text = document.createElement('span');
-      text.textContent = arabic(o.label);
+      text.textContent = dateText(o.label);
+      text.style.whiteSpace = 'pre-line';
       var small = document.createElement('small');
-      small.textContent = 'ว่าง ' + o.left;
+      small.textContent = (passport ? 'ว่าง / left ' : 'ว่าง ') + o.left;
       row.appendChild(radio); row.appendChild(text); row.appendChild(small);
       list.appendChild(row);
     });
@@ -287,16 +331,17 @@
   $('pin').addEventListener('input', function () { this.value = cleanPin(this.value); msg('pin-msg', '', ''); });
   $('pin-btn').onclick = function () {
     var pin = $('pin').value;
-    var formatMsg = passport ? 'กรุณากรอก 4 ตัวอักษรหรือตัวเลข / Please enter 4 characters' : 'กรุณากรอกตัวเลข 4 หลัก';
+    var formatMsg = passport ? 'กรุณากรอก 4 ตัวอักษรหรือตัวเลข\nPlease enter 4 characters' : 'กรุณากรอกตัวเลข 4 หลัก';
     if (pin.length !== 4) return msg('pin-msg', 'bad', formatMsg);
     busy(true);
-    msg('pin-msg', 'info', 'กำลังตรวจสอบ…');
+    msg('pin-msg', 'info', L(['กำลังตรวจสอบ…', 'Checking…']));
     api('verify', [TOKEN, pin]).then(function (res) {
       busy(false);
       if (res.ok) { session = res.session; return render(res); }
       if (res.error === 'LOCKED') return showError('LOCKED');
-      if (res.error === 'WRONG') return msg('pin-msg', 'bad', (passport ? 'เลขไม่ถูกต้อง / Incorrect' : 'เลขบัตรไม่ถูกต้อง') + ' (เหลือ ' + res.remaining + ' ครั้ง' + (passport ? ' / ' + res.remaining + ' attempts left' : '') + ')');
-      msg('pin-msg', 'bad', ERROR_TEXT[res.error] || formatMsg);
+      if (res.error === 'WRONG') return msg('pin-msg', 'bad', L([(passport ? 'เลขไม่ถูกต้อง' : 'เลขบัตรไม่ถูกต้อง') + ' (เหลือ ' + res.remaining + ' ครั้ง)',
+                                                                'Incorrect (' + res.remaining + ' attempts left)']));
+      msg('pin-msg', 'bad', ERROR_TEXT[res.error] ? L(ERROR_TEXT[res.error]) : formatMsg);
     }).catch(fail('pin-msg'));
   };
   $('btn-confirm').onclick = function () {
@@ -305,24 +350,25 @@
   $('btn-resched').onclick = function () { renderSlots(); show('resched'); };
   $('r-save').onclick = function () {
     var picked = document.querySelector('input[name=slot]:checked');
-    if (!picked) return msg('r-msg', 'bad', 'กรุณาเลือกวันเวลา');
+    if (!picked) return msg('r-msg', 'bad', L(['กรุณาเลือกวันเวลา', 'Please choose a date and time.']));
     call('reschedule', [session, picked.value], render, 'r-msg');
   };
   $('btn-nopros').onclick = function () { show('nopros'); };
   $('n-save').onclick = function () {
-    if ($('n-phone').value.replace(/\D/g, '').length < 9) return msg('n-msg', 'bad', ERROR_TEXT.PHONE);
-    if (!$('n-note').value.trim()) return msg('n-msg', 'bad', ERROR_TEXT.REASON);
-    if (!window.confirm('ยืนยันแจ้งว่าไม่ประสงค์ดำเนินคดี?\nการแจ้งจะมีผลเมื่อเจ้าหน้าที่ได้รับหนังสือตัวจริงที่ลงลายมือชื่อแล้ว')) return;
+    if ($('n-phone').value.replace(/\D/g, '').length < 9) return msg('n-msg', 'bad', L(ERROR_TEXT.PHONE));
+    if (!$('n-note').value.trim()) return msg('n-msg', 'bad', L(ERROR_TEXT.REASON));
+    if (!window.confirm(L(['ยืนยันแจ้งว่าไม่ประสงค์ดำเนินคดี?\nการแจ้งจะมีผลเมื่อเจ้าหน้าที่ได้รับหนังสือตัวจริงที่ลงลายมือชื่อแล้ว',
+                           '\nConfirm that you do not wish to pursue the case?\nThis takes effect only when we receive the signed original form.']))) return;
     call('noProsecution', [session, $('n-phone').value, $('n-note').value], function (res) {
       render(res);
     }, 'n-msg');
   };
   $('btn-callback').onclick = function () { show('callback'); };
   $('c-save').onclick = function () {
-    if ($('c-phone').value.replace(/\D/g, '').length < 9) return msg('c-msg', 'bad', ERROR_TEXT.PHONE);
+    if ($('c-phone').value.replace(/\D/g, '').length < 9) return msg('c-msg', 'bad', L(ERROR_TEXT.PHONE));
     call('requestCallback', [session, $('c-phone').value, $('c-note').value], function () {
       show('main');
-      msg('m-notice', 'ok', 'ได้รับคำขอแล้ว เจ้าหน้าที่จะโทรกลับโดยเร็ว');
+      msg('m-notice', 'ok', L(['ได้รับคำขอแล้ว เจ้าหน้าที่จะโทรกลับโดยเร็ว', 'Request received. We will call you soon.']));
     }, 'c-msg');
   };
   function openHelp() { msg('h-msg', '', ''); $('h-save').classList.remove('hidden'); show('help'); }
@@ -330,23 +376,23 @@
   $('err-help').onclick = openHelp;
   $('h-back').onclick = function () { show(lastView); };
   $('h-save').onclick = function () {
-    if ($('h-phone').value.replace(/\D/g, '').length < 9) return msg('h-msg', 'bad', ERROR_TEXT.PHONE + ' / Please enter a valid phone number');
+    if ($('h-phone').value.replace(/\D/g, '').length < 9) return msg('h-msg', 'bad', both(ERROR_TEXT.PHONE));
     call('requestHelp', [TOKEN, $('h-phone').value, $('h-note').value], function () {
-      msg('h-msg', 'ok', 'ได้รับคำขอแล้ว เจ้าหน้าที่จะติดต่อกลับโดยเร็ว / Request received. We will call you soon.');
+      msg('h-msg', 'ok', both(['ได้รับคำขอแล้ว เจ้าหน้าที่จะติดต่อกลับโดยเร็ว', 'Request received. We will call you soon.']));
       $('h-save').classList.add('hidden');
     }, 'h-msg');
   };
   document.querySelectorAll('[data-back]').forEach(function (b) { b.onclick = function () { show('main'); }; });
 
-  $('n-address').textContent = 'กองคดีธุรกิจการเงินนอกระบบ กรมสอบสวนคดีพิเศษ เลขที่ 128 ถนนแจ้งวัฒนะ แขวงทุ่งสองห้อง เขตหลักสี่ กรุงเทพฯ 10210';
+  $('n-address').textContent = RETURN_ADDRESS;
   if (!TOKEN) {
     showError('NOT_FOUND');
   } else {
     api('preview', [TOKEN]).then(function (res) {
       if (!res.ok) return showError(res.error);
-      $('p-name').textContent = res.maskedName;
-      $('p-appt').textContent = arabic(res.appointment);
       setupPin(res.idType);
+      $('p-name').textContent = res.maskedName;
+      $('p-appt').textContent = dateText(res.appointment);
       show('pin');
       $('pin').focus();
     }).catch(function () { showError('NOT_FOUND'); });
