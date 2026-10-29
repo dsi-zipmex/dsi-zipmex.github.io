@@ -43,6 +43,10 @@
   /* ภาษาอังกฤษสำหรับผู้ใช้หนังสือเดินทาง (เพิ่มโดย setupPin) */
   .en { display:block; font-size:.82em; font-weight:400; opacity:.85; }
   .msg, .appt { white-space:pre-line; }
+  .emailbox { border:1px dashed var(--line); border-radius:8px; padding:10px 12px; margin-top:12px; font-size:16px; }
+  .row2 { display:flex; gap:8px; }
+  .row2 button { padding:10px; margin-top:8px; }
+  .center { background:var(--bg); border-radius:8px; padding:12px; font-weight:600; margin:8px 0; color:var(--brand); }
   .hidden { display:none; }
   footer { text-align:center; color:var(--muted); font-size:15px; padding:8px 0 24px; }
 </style>
@@ -77,12 +81,32 @@
     <div class="name" id="m-name"></div>
     <div data-en="Appointment">วันเวลานัด</div>
     <div class="appt" id="m-appt"></div>
-    <div style="font-size:16px;color:var(--muted);margin-top:6px">สถานที่: <span id="m-place"></span><span id="m-place-en" class="en hidden"></span>
+    <div id="m-placebox" style="font-size:16px;color:var(--muted);margin-top:6px">สถานที่: <span id="m-place"></span><span id="m-place-en" class="en hidden"></span>
       <a class="maplink" href="https://maps.app.goo.gl/L9F37NFZwfWs8qNb7" target="_blank" rel="noopener" data-en="Open in Google Maps">เปิดแผนที่นำทาง (Google Maps)</a></div>
+    <div id="m-email" class="emailbox hidden">
+      <div id="e-view">
+        <div><span data-en="Contact email">อีเมลสำหรับติดต่อ</span> <b id="e-masked"></b> <span id="e-state"></span></div>
+        <div class="row2" id="e-buttons">
+          <button class="primary" id="e-ok" data-en="Correct">ถูกต้อง</button>
+          <button class="secondary" id="e-edit" data-en="Change">แก้ไข</button>
+        </div>
+        <button class="link hidden" id="e-change" data-en="Change email">เปลี่ยนอีเมล</button>
+      </div>
+      <div id="e-form" class="hidden">
+        <label for="e-1" data-en="Contact email">อีเมลสำหรับติดต่อ</label>
+        <input id="e-1" type="email" inputmode="email" autocomplete="email" maxlength="100">
+        <label for="e-2" data-en="Enter the email again">กรอกอีเมลอีกครั้ง</label>
+        <input id="e-2" type="email" inputmode="email" autocomplete="off" maxlength="100">
+        <button class="primary" id="e-save" data-en="Save email">บันทึกอีเมล</button>
+        <button class="link" id="e-cancel" data-en="Cancel">ยกเลิก</button>
+      </div>
+      <div id="e-msg"></div>
+    </div>
     <div id="m-status"></div>
     <div id="m-actions">
       <button class="primary" id="btn-confirm" data-en="Confirm I will attend">ยืนยันว่าจะไปตามนัด</button>
       <button class="secondary" id="btn-resched" data-en="Change date / time">ขอเปลี่ยนวันเวลา</button>
+      <button class="secondary" id="btn-regional" data-en="Give my statement at a regional DSI centre">ขอให้ถ้อยคำที่ศูนย์ฯ ต่างจังหวัด</button>
       <button class="danger" id="btn-nopros" data-en="I do not wish to pursue the case">ไม่ประสงค์ดำเนินคดี</button>
     </div>
     <button class="link" id="btn-callback" data-en="Request a call back">ต้องการให้เจ้าหน้าที่โทรกลับ</button>
@@ -111,6 +135,22 @@
     <textarea id="n-note" rows="2" maxlength="300"></textarea>
     <div id="n-msg"></div>
     <button class="danger" id="n-save" data-en="Notify (documents to follow by post)">แจ้งว่าไม่ประสงค์ดำเนินคดี (พร้อมส่งเอกสาร)</button>
+    <button class="link" data-back data-en="Back">ย้อนกลับ</button>
+  </section>
+
+  <section id="v-regional" class="card hidden">
+    <div class="name" data-en="Give your statement at a regional DSI centre">ขอให้ถ้อยคำที่ศูนย์ปฏิบัติการคดีพิเศษเขตพื้นที่</div>
+    <p style="font-size:16px" data-en="For those living outside Bangkok. Choose the province where you currently live and the responsible centre will be shown. Our investigator will contact you with the date, time and place.">สำหรับผู้ที่อยู่ต่างจังหวัดและไม่สะดวกเดินทางมากรุงเทพฯ กรุณาเลือกจังหวัดที่ท่านอยู่ในปัจจุบัน ระบบจะแสดงศูนย์ฯ ที่รับผิดชอบ พนักงานสอบสวนจะประสานศูนย์ฯ และแจ้งวันเวลาและสถานที่ให้ท่านทราบอีกครั้ง</p>
+    <label for="g-province" data-en="Province where you live now">จังหวัดที่อยู่ปัจจุบัน</label>
+    <select id="g-province"><option value="">— เลือกจังหวัด —</option></select>
+    <div id="g-center" class="center hidden"></div>
+    <label for="g-phone" data-en="Contact phone number">เบอร์โทรศัพท์ที่ติดต่อได้</label>
+    <input id="g-phone" inputmode="tel" maxlength="20">
+    <label for="g-note" data-en="Note (optional), e.g. convenient days">หมายเหตุ (ถ้ามี) เช่น วันที่สะดวก</label>
+    <textarea id="g-note" rows="2" maxlength="300"></textarea>
+    <p style="font-size:15px;color:var(--muted)" data-en="Once confirmed, your Bangkok appointment is released. If you change your mind, press Change date / time to choose a Bangkok appointment again.">เมื่อยืนยันแล้ว วันนัดที่กรุงเทพฯ จะถูกยกเลิก หากเปลี่ยนใจ สามารถกด "ขอเปลี่ยนวันเวลา" เพื่อเลือกวันนัดที่กรุงเทพฯ ได้อีกครั้ง</p>
+    <div id="g-msg"></div>
+    <button class="primary" id="g-save" data-en="Confirm request">ยืนยันขอให้ถ้อยคำที่ศูนย์ฯ</button>
     <button class="link" data-back data-en="Back">ย้อนกลับ</button>
   </section>
 
@@ -173,7 +213,30 @@
     NO_PROSECUTION_RECEIVED: ['warn', 'เจ้าหน้าที่ได้รับหนังสือแจ้งความประสงค์ไม่ร้องทุกข์กล่าวโทษของท่านแล้ว',
                               'We have received your signed form.'],
     ARRIVED: ['ok', 'ท่านได้ไปให้ปากคำแล้ว ขอบคุณที่ให้ความร่วมมือ', 'You have given your statement. Thank you for your cooperation.'],
+    REGIONAL_REQUESTED: ['ok', 'ท่านแจ้งขอให้ถ้อยคำที่ศูนย์ฯ ต่างจังหวัดแล้ว พนักงานสอบสวนจะติดต่อแจ้งวันเวลาและสถานที่ให้ทราบ วันนัดที่กรุงเทพฯ ถูกยกเลิกแล้ว',
+                         'Your request has been recorded. Our investigator will contact you with the date, time and place. Your Bangkok appointment has been released.'],
   };
+  // ศูนย์ปฏิบัติการคดีพิเศษเขตพื้นที่ → จังหวัดที่รับผิดชอบ (ใช้จังหวัดที่ตั้งศูนย์ ไม่ใช้ที่อยู่/เบอร์ ซึ่งเปลี่ยนได้ตามสัญญาเช่า)
+  var CENTERS = {
+    1: ['พระนครศรีอยุธยา', 'Phra Nakhon Si Ayutthaya', 'พระนครศรีอยุธยา อ่างทอง สิงห์บุรี ชัยนาท สระบุรี ลพบุรี ปทุมธานี นนทบุรี สมุทรปราการ'],
+    2: ['ชลบุรี', 'Chon Buri', 'ชลบุรี ระยอง จันทบุรี ตราด ปราจีนบุรี สระแก้ว ฉะเชิงเทรา นครนายก'],
+    3: ['นครราชสีมา', 'Nakhon Ratchasima', 'นครราชสีมา ชัยภูมิ บุรีรัมย์ สุรินทร์ ศรีสะเกษ ยโสธร อุบลราชธานี อำนาจเจริญ'],
+    4: ['ขอนแก่น', 'Khon Kaen', 'ขอนแก่น มหาสารคาม ร้อยเอ็ด กาฬสินธุ์ มุกดาหาร สกลนคร นครพนม อุดรธานี หนองบัวลำภู หนองคาย เลย บึงกาฬ'],
+    5: ['เชียงใหม่', 'Chiang Mai', 'เชียงใหม่ ลำพูน แม่ฮ่องสอน ลำปาง น่าน แพร่ เชียงราย พะเยา'],
+    6: ['พิษณุโลก', 'Phitsanulok', 'พิษณุโลก พิจิตร สุโขทัย อุตรดิตถ์ ตาก กำแพงเพชร นครสวรรค์ อุทัยธานี เพชรบูรณ์'],
+    7: ['นครปฐม', 'Nakhon Pathom', 'นครปฐม สมุทรสาคร สมุทรสงคราม กาญจนบุรี สุพรรณบุรี ราชบุรี เพชรบุรี ประจวบคีรีขันธ์'],
+    8: ['สุราษฎร์ธานี', 'Surat Thani', 'ชุมพร ระนอง สุราษฎร์ธานี นครศรีธรรมราช พังงา กระบี่ ภูเก็ต'],
+    9: ['สงขลา', 'Songkhla', 'สงขลา พัทลุง ตรัง สตูล'],
+    10: ['ปัตตานี', 'Pattani', 'ปัตตานี ยะลา นราธิวาส'],
+  };
+  var PROVINCE_CENTER = {};
+  Object.keys(CENTERS).forEach(function (n) {
+    CENTERS[n][2].split(' ').forEach(function (p) { PROVINCE_CENTER[p] = Number(n); });
+  });
+  function centerText(n) {
+    return L(['ศูนย์ปฏิบัติการคดีพิเศษเขตพื้นที่ ' + n + ' (จ.' + CENTERS[n][0] + ')',
+              'DSI Regional Operation Centre ' + n + ' (' + CENTERS[n][1] + ')']);
+  }
   var REASON_TEXT = {
     MAX_CHANGES: ['ท่านเปลี่ยนวันนัดครบจำนวนครั้งที่กำหนดแล้ว หากต้องการเปลี่ยนอีก กรุณากด "ต้องการให้เจ้าหน้าที่โทรกลับ"',
                   'You have reached the maximum number of changes. To change again, please press "Request a call back".'],
@@ -190,6 +253,9 @@
     SLOT_FULL: ['รอบที่เลือกเต็มแล้ว กรุณาเลือกรอบอื่น', 'That time is full. Please choose another.'],
     NOT_ALLOWED: ['ไม่สามารถเปลี่ยนวันนัดได้', 'The appointment cannot be changed.'],
     PHONE: ['กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง', 'Please enter a valid phone number.'],
+    EMAIL: ['กรุณากรอกอีเมลให้ถูกต้อง', 'Please enter a valid email address.'],
+    EMAIL_MISMATCH: ['อีเมลทั้งสองช่องไม่ตรงกัน', 'The two email addresses do not match.'],
+    PROVINCE: ['กรุณาเลือกจังหวัด', 'Please choose a province.'],
     REASON: ['กรุณาระบุเหตุผลที่ไม่ประสงค์ดำเนินคดี', 'Please give your reason.'],
     STATUS: ['ไม่สามารถทำรายการนี้ได้ในสถานะปัจจุบัน', 'This action is not available for your appointment.'],
     HELP_LIMIT: ['ส่งคำขอครบจำนวนแล้ว กรุณาโทรติดต่อเจ้าหน้าที่ตามเบอร์ด้านล่าง', 'Request limit reached. Please call the number below.'],
@@ -218,7 +284,7 @@
     return passport ? th + '\n' + englishDate(label) : th;
   }
   function show(view) {
-    ['loading', 'error', 'pin', 'main', 'resched', 'nopros', 'callback', 'help'].forEach(function (v) {
+    ['loading', 'error', 'pin', 'main', 'resched', 'nopros', 'callback', 'help', 'regional'].forEach(function (v) {
       $('v-' + v).classList.toggle('hidden', v !== view);
     });
     window.scrollTo(0, 0);
@@ -283,14 +349,20 @@
   function render(st) {
     current = st;
     $('m-name').textContent = st.maskedName;
-    $('m-appt').textContent = dateText(st.appointment);
+    var regional = st.status === 'REGIONAL_REQUESTED';
+    $('m-appt').textContent = regional
+      ? L(['รอพนักงานสอบสวนแจ้งวันเวลา — ' + st.center.split(' | ')[0].replace('เขต', 'ศูนย์ฯ เขตพื้นที่'), 'Date to be arranged by our investigator'])
+      : dateText(st.appointment);
+    $('m-placebox').classList.toggle('hidden', regional);
+    renderEmail(st);
     $('m-place').textContent = arabic(st.place);
     var s = STATUS_TEXT[st.status] || ['', '', ''];
     msg('m-status', s[0], L([s[1], s[2]]));
     msg('m-notice', '', '');
     var active = ['SCHEDULED', 'CONFIRMED', 'RESCHEDULED'].indexOf(st.status) >= 0;
-    $('m-actions').classList.toggle('hidden', !active);
-    $('btn-confirm').classList.toggle('hidden', st.status === 'CONFIRMED' || st.status === 'RESCHEDULED');
+    $('m-actions').classList.toggle('hidden', !active && !regional);
+    $('btn-confirm').classList.toggle('hidden', st.status === 'CONFIRMED' || st.status === 'RESCHEDULED' || regional);
+    $('btn-regional').classList.toggle('hidden', regional);
     $('btn-resched').classList.toggle('hidden', !st.canReschedule);
     var reason = REASON_TEXT[st.rescheduleReason];
     if (active && !st.canReschedule && reason) {
@@ -354,6 +426,52 @@
     call('reschedule', [session, picked.value], render, 'r-msg');
   };
   $('btn-nopros').onclick = function () { show('nopros'); };
+
+  // อีเมลติดต่อ: แสดงอีเมลเดิมแบบปิดบางส่วน → ถูกต้อง / แก้ไข (ไม่บังคับ ไม่บล็อกปุ่มอื่น)
+  function renderEmail(st) {
+    $('m-email').classList.remove('hidden');
+    msg('e-msg', '', '');
+    var has = !!st.maskedEmail, done = !!st.emailStatus;
+    $('e-masked').textContent = st.maskedEmail;
+    $('e-state').textContent = done ? (passport ? '✓ ยืนยันแล้ว / confirmed' : '✓ ยืนยันแล้ว') : '';
+    $('e-view').classList.toggle('hidden', !has);
+    $('e-buttons').classList.toggle('hidden', done);
+    $('e-change').classList.toggle('hidden', !done);
+    $('e-form').classList.toggle('hidden', has);
+    $('e-cancel').classList.toggle('hidden', !has);
+  }
+  function openEmailForm() { $('e-view').classList.add('hidden'); $('e-form').classList.remove('hidden'); $('e-1').focus(); }
+  $('e-edit').onclick = openEmailForm;
+  $('e-change').onclick = openEmailForm;
+  $('e-cancel').onclick = function () { renderEmail(current); };
+  $('e-ok').onclick = function () { call('confirmEmail', [session], function (res) { current = res; renderEmail(res); }, 'e-msg'); };
+  $('e-save').onclick = function () {
+    var e1 = $('e-1').value.trim().toLowerCase(), e2 = $('e-2').value.trim().toLowerCase();
+    if (!/^[^\s@<>]+@[^\s@<>]+\.[a-z]{2,}$/.test(e1)) return msg('e-msg', 'bad', L(ERROR_TEXT.EMAIL));
+    if (e1 !== e2) return msg('e-msg', 'bad', L(ERROR_TEXT.EMAIL_MISMATCH));
+    call('updateEmail', [session, e1], function (res) {
+      current = res; renderEmail(res);
+      msg('e-msg', 'ok', L(['บันทึกอีเมลแล้ว', 'Email saved.']));
+    }, 'e-msg');
+  };
+
+  // ขอให้ถ้อยคำที่ศูนย์ฯ ต่างจังหวัด
+  Object.keys(PROVINCE_CENTER).sort(function (a, b) { return a.localeCompare(b, 'th'); }).forEach(function (p) {
+    var o = document.createElement('option'); o.value = p; o.textContent = p; $('g-province').appendChild(o);
+  });
+  $('g-province').onchange = function () {
+    var n = PROVINCE_CENTER[this.value];
+    $('g-center').textContent = n ? centerText(n) : '';
+    $('g-center').classList.toggle('hidden', !n);
+  };
+  $('btn-regional').onclick = function () { msg('g-msg', '', ''); show('regional'); };
+  $('g-save').onclick = function () {
+    var prov = $('g-province').value, n = PROVINCE_CENTER[prov];
+    if (!n) return msg('g-msg', 'bad', L(ERROR_TEXT.PROVINCE));
+    if ($('g-phone').value.replace(/\D/g, '').length < 9) return msg('g-msg', 'bad', L(ERROR_TEXT.PHONE));
+    if (!window.confirm(L(['ยืนยันขอให้ถ้อยคำที่ศูนย์ฯ ต่างจังหวัด?\nวันนัดที่กรุงเทพฯ จะถูกยกเลิก', '\nConfirm? Your Bangkok appointment will be released.']))) return;
+    call('requestRegional', [session, n, prov, $('g-phone').value, $('g-note').value], render, 'g-msg');
+  };
   $('n-save').onclick = function () {
     if ($('n-phone').value.replace(/\D/g, '').length < 9) return msg('n-msg', 'bad', L(ERROR_TEXT.PHONE));
     if (!$('n-note').value.trim()) return msg('n-msg', 'bad', L(ERROR_TEXT.REASON));
